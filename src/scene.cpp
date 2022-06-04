@@ -127,6 +127,7 @@ void scene_structure::animate() {
 }
 
 void scene_structure::display_boids() {
+    boids.update();
     for (Boid &boid: boids.boids_vector) {
         boid.update();
         draw(boid.mesh_drawable, environment);
@@ -134,9 +135,9 @@ void scene_structure::display_boids() {
         if (gui.display_wireframe) {
             draw_wireframe(boid.mesh_drawable, environment);
         }
-        if (gui.display_cube){
-            draw_wireframe(boids.cube_mesh_drawable, environment);
-        }
+    }
+    if (gui.display_cube) {
+        draw_wireframe(boids.cube_mesh_drawable, environment);
     }
 }
 
@@ -151,6 +152,16 @@ void scene_structure::display_gui() {
     ImGui::Checkbox("billboard", &gui.display_billboard);
     ImGui::Checkbox("boids_vector", &gui.display_boids);
     ImGui::Checkbox("cube", &gui.display_cube);
+
+    ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
+    ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
+    ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
+    ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
+    ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 2);
+    ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
+    ImGui::SliderFloat("maximal_speed", &boids.max_speed, 0.5, 10);
+    ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
+
 }
 
 

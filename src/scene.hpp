@@ -12,7 +12,7 @@ struct gui_parameters {
     bool display_mushroom = false;
     bool display_billboard = false;
     bool display_boids = true;
-    bool display_cube = false;
+    bool display_cube = true;
 };
 
 
