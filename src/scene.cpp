@@ -3,6 +3,7 @@
 #include "terrain.hpp"
 #include "tree.hpp"
 
+
 using namespace cgp;
 
 void scene_structure::initialize() {
@@ -10,7 +11,7 @@ void scene_structure::initialize() {
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
     environment.camera.axis = camera_spherical_coordinates_axis::z;
-    environment.camera.look_at({25.0f, 30.0f, 0.0f}, {0, 0, 10.0f});
+    environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 10.0f});
 
     // Initialize the terrain
     int N_terrain_samples = 200;
@@ -36,8 +37,9 @@ void scene_structure::initialize() {
     billboard.transform.scaling = 0.6f;
     billboard_position = generate_positions_on_terrain(75, terrain_length);
 
-    //initalize boids
+    //initalize boids_vector
     boids.setup();
+
 }
 
 
@@ -125,14 +127,15 @@ void scene_structure::animate() {
 }
 
 void scene_structure::display_boids() {
-    draw(boids.rectangle_mesh_drawable, environment);
-    for (Boid &boid: boids.boids) {
+    for (Boid &boid: boids.boids_vector) {
         boid.update();
         draw(boid.mesh_drawable, environment);
 
         if (gui.display_wireframe) {
             draw_wireframe(boid.mesh_drawable, environment);
-            draw_wireframe(boids.rectangle_mesh_drawable, environment);
+        }
+        if (gui.display_cube){
+            draw_wireframe(boids.cube_mesh_drawable, environment);
         }
     }
 }
@@ -146,6 +149,8 @@ void scene_structure::display_gui() {
     ImGui::Checkbox("tree", &gui.display_tree);
     ImGui::Checkbox("mushroom", &gui.display_mushroom);
     ImGui::Checkbox("billboard", &gui.display_billboard);
+    ImGui::Checkbox("boids_vector", &gui.display_boids);
+    ImGui::Checkbox("cube", &gui.display_cube);
 }
 
 

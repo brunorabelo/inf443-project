@@ -12,6 +12,7 @@ struct gui_parameters {
     bool display_mushroom = false;
     bool display_billboard = false;
     bool display_boids = true;
+    bool display_cube = false;
 };
 
 
@@ -24,7 +25,7 @@ struct scene_structure {
 
     cgp::mesh_drawable global_frame;          // The standard global frame
     cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
-    cgp::inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension)
+    cgp::inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension_size)
 
     gui_parameters gui;                       // Standard GUI element storage
 

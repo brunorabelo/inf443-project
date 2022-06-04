@@ -8,38 +8,56 @@
 
 #include "cgp/cgp.hpp"
 
+static int count = 0;
+
 class Boid {
+
 
 public:
     cgp::mesh_drawable mesh_drawable;
     cgp::vec3 position; // position
     cgp::vec3 velocity; // velocity
+    cgp::vec3 normal;
+    std::string name;
 
-    Boid(cgp::vec3 position, cgp::vec3 speed) {
-        position = position;
-        speed = speed;
-        mesh_drawable.initialize(mesh_primitive_cone(0.5f, 1.0f, position, {1, 0, 0}));
-    }
+    Boid(cgp::vec3 position, cgp::vec3 velocity);
 
     void update();
+
+    bool isEqual(Boid b);
 
 };
 
 class Boids {
 
+private:
 
-public:
-    std::vector<Boid> boids;
-    cgp::mesh_drawable rectangle_mesh_drawable;
+    float dimension_size = 10.0f;
+    cgp::vec3 dimension_center;
 
+    cgp::vec3 rule1(Boid &boid);
+
+    cgp::vec3 rule2(Boid &boid);
+
+    cgp::vec3 rule3(Boid &boid);
 
     void addBoid(cgp::vec3 position, cgp::vec3 speed);
 
-    void addBoid(Boid b);
+public:
+    std::vector<Boid> boids_vector;
+    cgp::mesh_drawable cube_mesh_drawable;
+
+    float damping_factor_rule1 = 50.0f;
+    float minimal_distance = 2.0f;
+    float damping_factor_rule2 = 10.0f;
+    float damping_factor_rule3 = 40.0f;
+
+    Boids(float dimension, cgp::vec3 dimension_center);
 
     void setup();
 
     void move_new_positions(float d);
+
 };
 
 
