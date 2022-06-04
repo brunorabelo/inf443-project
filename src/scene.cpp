@@ -125,13 +125,15 @@ void scene_structure::animate() {
 }
 
 void scene_structure::display_boids() {
-//    draw(boids.rectangle_mesh_drawable, environment);
+    draw(boids.rectangle_mesh_drawable, environment);
     for (Boid &boid: boids.boids) {
         boid.update();
         draw(boid.mesh_drawable, environment);
 
-        if (gui.display_wireframe)
+        if (gui.display_wireframe) {
             draw_wireframe(boid.mesh_drawable, environment);
+            draw_wireframe(boids.rectangle_mesh_drawable, environment);
+        }
     }
 }
 

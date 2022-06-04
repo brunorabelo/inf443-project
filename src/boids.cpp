@@ -24,7 +24,7 @@ void Boids::setup() {
     for (int k = 0; k < N; ++k) {
         float const x = rand_interval(center[0] - dimension / 2, center[1] + dimension / 2);
         float const y = center[1] + (rand_interval() - 0.5f) * dimension;
-        float const z = center[3] + (rand_interval() - 0.5f) * dimension;
+        float const z = center[2] + (rand_interval() - 0.5f) * dimension;
 
 
         vec3 const p = {x, y, z};
@@ -41,7 +41,13 @@ void Boids::setup() {
     for (cgp::vec3 position: positions) {
         addBoid(position, {01, 0, 0});
     }
-//    rectangle_mesh_drawable.initialize(mesh_primitive_quadrangle());
+    vec3 q1, q2, q3, q4;
+
+    q1 = center + vec3{dimension / 2, 0, 0};
+    q2 = center + vec3{dimension / 2, 0, 0};
+    q3 = center + vec3{dimension / 2, 0, 0};
+    q4 = center + vec3{dimension / 2, 0, 0};
+    rectangle_mesh_drawable.initialize(mesh_primitive_cube(center, dimension));
 }
 
 void Boids::move_new_positions(float dt) {
@@ -52,7 +58,7 @@ void Boids::move_new_positions(float dt) {
 //        v3 = rule3(b);
 
 //        b.velocity = b.velocity + v1 + v2 + v3;
-        b.position = b.position + b.velocity * dt;
+//        b.position = b.position + b.velocity * dt;
     }
 }
 
