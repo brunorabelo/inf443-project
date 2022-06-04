@@ -3,7 +3,6 @@
 #include "terrain.hpp"
 #include "tree.hpp"
 
-
 using namespace cgp;
 
 void scene_structure::initialize() {
@@ -40,8 +39,8 @@ void scene_structure::initialize() {
     //initalize boids_vector
     boids.setup();
 
+    bird.setup();
 }
-
 
 void scene_structure::display() {
 
@@ -63,6 +62,11 @@ void scene_structure::display() {
     if (gui.display_mushroom) display_mushroom();
     if (gui.display_billboard) display_billboard();
     if (gui.display_boids) display_boids();
+
+    if (gui.display_bird)
+        bird.display(environment);
+    if(gui.display_wireframe)
+        bird.display_wireframe(environment);
 
 }
 

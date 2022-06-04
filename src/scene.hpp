@@ -2,6 +2,7 @@
 
 #include "cgp/cgp.hpp"
 #include "boids.hpp"
+#include "bird.hpp"
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
@@ -13,7 +14,9 @@ struct gui_parameters {
     bool display_billboard = false;
     bool display_boids = true;
     bool display_cube = true;
+    bool display_bird = true;
 };
+
 
 
 // The structure of the custom scene
@@ -41,6 +44,8 @@ struct scene_structure {
 
     Boids boids;
 
+    Bird bird;
+
 
     // Timer used for the interpolation of the position
     cgp::timer_event_periodic timer;
@@ -51,6 +56,7 @@ struct scene_structure {
     void display_mushroom();
 
     void display_billboard();
+
 
     void display_boids();
 
