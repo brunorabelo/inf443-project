@@ -1,15 +1,17 @@
 #pragma once
 
 #include "cgp/cgp.hpp"
+#include "water.hpp"
+#include "terrain.hpp"
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
-	bool display_frame      = true;
+	bool display_frame      = false;
 	bool display_wireframe  = false;
-	bool display_terrain   = true;
-	bool display_tree      = true;
-	bool display_mushroom  = true;
-	bool display_billboard = true;
+	bool display_terrain    = false;
+	bool display_water      = true;
+	bool reflect = false;
+	bool terrain_modeling_mode = false;
 };
 
 
@@ -26,21 +28,19 @@ struct scene_structure {
 	cgp::inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension)
 
 	gui_parameters gui;                       // Standard GUI element storage
-	
-	cgp::mesh_drawable terrain;
 
-	cgp::mesh_drawable tree;
-	cgp::mesh_drawable mushroom;
-	cgp::mesh_drawable billboard;
+	GLuint reflectable_shader;
+	GLuint fbo_reflection;
 
-	std::vector<cgp::vec3> tree_position;
-	std::vector<cgp::vec3> mushroom_position;
-	std::vector<cgp::vec3> billboard_position;
-	
-	void display_trees();
-	void display_mushroom();
-	void display_billboard();
+	cgp::mesh terrain;
+	cgp::mesh_drawable terrain_visual;
+	terrain_parameters tparams;
 
+	cgp::mesh water;
+	cgp::mesh_drawable water_visual;
+
+	cgp::mesh cone;
+	cgp::mesh_drawable cone_visual;
 
 	// ****************************** //
 	// Functions
