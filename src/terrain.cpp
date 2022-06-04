@@ -38,7 +38,7 @@ mesh create_terrain_mesh(int N, float terrain_length)
     {
         for(int kv=0; kv<N; ++kv)
         {
-            // Compute local parametric coordinates (u,v) \in [0,1]
+            // Compute local parametric coordinates (u,velocity) \in [0,1]
             float u = ku/(N-1.0f);
             float v = kv/(N-1.0f);
 
