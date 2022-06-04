@@ -3,6 +3,7 @@
 #include "cgp/cgp.hpp"
 #include "water.hpp"
 #include "terrain.hpp"
+#include "draw.hpp"
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {

@@ -44,7 +44,8 @@ void scene_structure::display()
 	// Display the other elements:
 
 	draw(cone_visual, environment);
-	draw_reflection(cone_visual, environment, GL_FRAMEBUFFER);
+
+    draw_reflection(cone_visual, environment, GL_FRAMEBUFFER);
 
 	if (gui.display_terrain) {
 		if (gui.reflect)

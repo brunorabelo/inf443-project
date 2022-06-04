@@ -38,7 +38,7 @@ uniform float specular_exp; // Specular exponent
 
 uniform mat4 view;       // View matrix (rigid transform) of the camera - to compute the camera position
 
-uniform bool reflect;    // Whether we're drawing a reflection or the real object
+//uniform bool reflect;    // Whether we're drawing a reflection or the real object
 
 void main()
 {
