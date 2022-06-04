@@ -18,14 +18,24 @@ class Bird {
     cgp::mesh_drawable eye_right;
     cgp::mesh_drawable eye_left;
     cgp::mesh_drawable nose;
-    cgp::hierarchy_mesh_drawable hierarchy;
 
 public:
+    cgp::hierarchy_mesh_drawable hierarchy;
+
     void setup();
 
     void display(cgp::scene_environment_basic_camera_spherical_coords environment);
 
     void display_wireframe(cgp::scene_environment_basic_camera_spherical_coords coords);
+
+    void animate(float t);
+
+    void rotate(cgp::rotation_transform rt);
+    void translate(cgp::vec3 t);
+
+    void animate(float t, bool wings);
+
+    void animate(float t, float speed_z);
 };
 
 

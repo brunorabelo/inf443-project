@@ -10,7 +10,7 @@ void scene_structure::initialize() {
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
     environment.camera.axis = camera_spherical_coordinates_axis::z;
-    environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 10.0f});
+    environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 0.0f});
 
     // Initialize the terrain
     int N_terrain_samples = 200;
@@ -65,7 +65,7 @@ void scene_structure::display() {
 
     if (gui.display_bird)
         bird.display(environment);
-    if(gui.display_wireframe)
+    if (gui.display_wireframe)
         bird.display_wireframe(environment);
 
 }
@@ -127,17 +127,18 @@ void scene_structure::animate() {
 
     // Update the current time
     float dt = timer.update();
-    boids.move_new_positions(dt);
+    boids.animate(dt, timer.t);
 }
 
 void scene_structure::display_boids() {
     boids.update();
+
     for (Boid &boid: boids.boids_vector) {
         boid.update();
-        draw(boid.mesh_drawable, environment);
+        draw(boid.bird.hierarchy, environment);
 
         if (gui.display_wireframe) {
-            draw_wireframe(boid.mesh_drawable, environment);
+            draw_wireframe(boid.bird.hierarchy, environment);
         }
     }
     if (gui.display_cube) {
@@ -161,9 +162,9 @@ void scene_structure::display_gui() {
     ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
     ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
     ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
-    ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 2);
+    ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
     ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
-    ImGui::SliderFloat("maximal_speed", &boids.max_speed, 0.5, 10);
+    ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
     ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
 
 }

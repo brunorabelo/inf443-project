@@ -17,9 +17,10 @@ Boid::Boid(cgp::vec3 position, cgp::vec3 velocity, float perch_timer = 10.0f) {
     this->normal = {0, 0, 1};
     this->name = "boid" + std::to_string(count++);
     this->perch_timer = perch_timer;
-    mesh m = mesh_primitive_cone(0.5f, 1.0f, {0, 0, -0.25}, normal);
-    m.push_back(mesh_primitive_frame());
-    this->mesh_drawable.initialize(m, name);
+//    mesh m = mesh_primitive_cone(0.5f, 1.0f, {0, 0, -0.25}, normal);
+//    m.push_back(mesh_primitive_frame());
+//    this->mesh_drawable.initialize(m, name);
+    bird.setup();
 }
 
 void Boids::addBoid(vec3 position = {0, 0, 1}, vec3 velocity = {0, 0, 0}) {
@@ -31,7 +32,7 @@ Boids::Boids(float size, cgp::vec3 center) {
     this->dimension_center = center;
 }
 
-Boids::Boids() : Boids(20.0f, {0, 0, 5.0f}) {};
+Boids::Boids() : Boids(80.0f, {0, 0, 5.0f}) {};
 
 
 void Boids::setup() {
@@ -76,15 +77,15 @@ vec3 Boids::limit_velocity(vec3 velocity) {
 }
 
 void Boid::update() {
-    mesh_drawable.transform.rotation = rotation_transform::between_vector({0, 0, 1}, normal);
-    this->mesh_drawable.transform.translation = this->position;
+    bird.rotate(rotation_transform::between_vector({0, 0, 1}, normal));
+    bird.translate(this->position);
 }
 
 void Boids::update() {
     cube_mesh_drawable.transform.scaling = dimension_size / initial_dimension_size;
 }
 
-void Boids::move_new_positions(float dt) {
+void Boids::animate(float d, float time) {
     vec3 v1, v2, v3;
 
 
@@ -92,7 +93,7 @@ void Boids::move_new_positions(float dt) {
 
         if (b.perching) {
             if (b.perch_timer > 0) {
-                b.perch_timer -= dt;
+                b.perch_timer -= d;
                 continue;
             } else {
                 b.perching = false;
@@ -111,8 +112,10 @@ void Boids::move_new_positions(float dt) {
         b.velocity = bound_position(b);
 
         // apply physics
-        b.position += b.velocity * dt;
+        b.position += b.velocity * d;
         b.normal = b.velocity / norm(b.velocity);
+
+        b.bird.animate(time, b.velocity.z);
     }
 }
 
