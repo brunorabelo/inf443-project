@@ -169,17 +169,23 @@ void scene_structure::display_gui() {
             update_terrain(terrain, terrain_visual, tparams);
     }
 
-
     ImGui::Checkbox("boids_vector", &gui.display_boids);
-    ImGui::Checkbox("cube", &gui.display_cube);
-    ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
-    ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
-    ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
-    ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
-    ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
-    ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
-    ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
-    ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
+
+    if (gui.display_boids)
+        ImGui::Checkbox("Boids modeling mode", &gui.boids_modeling_mode);
+    if (gui.display_boids && gui.boids_modeling_mode){
+
+        ImGui::Checkbox("cube", &gui.display_cube);
+        ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
+        ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
+        ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
+        ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
+        ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
+        ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
+        ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
+        ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
+
+    }
 
 }
 
