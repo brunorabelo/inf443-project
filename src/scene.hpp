@@ -1,11 +1,13 @@
 #pragma once
 
 #include "cgp/cgp.hpp"
+#include "environment_camera/environment_camera.hpp"
 #include "boids.hpp"
 #include "bird.hpp"
 #include "water.hpp"
 #include "terrain.hpp"
 #include "draw.hpp"
+#include "keyboard/keyboard.hpp"
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
@@ -17,10 +19,9 @@ struct gui_parameters {
     bool display_billboard = false;
     bool display_boids = true;
     bool display_cube = true;
-    bool display_bird = true;
     bool compute_lighting = true;
     bool display_water = true;
-    bool display_cone = true;
+    bool display_cone = false;
     bool reflect = true;
     bool terrain_modeling_mode = false;
     bool boids_modeling_mode = false;
@@ -35,8 +36,8 @@ struct scene_structure {
     // ****************************** //
 
     cgp::mesh_drawable global_frame;          // The standard global frame
-    cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
-    cgp::inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension_size)
+    environment_camera environment; // Standard environment controler
+    custom_inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension_size)
 
     gui_parameters gui;                       // Standard GUI element storage
 
@@ -66,18 +67,16 @@ struct scene_structure {
 
     Boids boids;
 
-    Bird bird;
-
 
     // Timer used for the interpolation of the position
     cgp::timer_event_periodic timer;
 
+    float camera_speed = 2.0f; // camera speed
+    float camera_rotation_damping = 50.0f;
 
-    void display_trees();
 
-    void display_mushroom();
+    void update_camera();
 
-    void display_billboard();
 
     void display_boids();
 

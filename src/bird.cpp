@@ -3,6 +3,7 @@
 //
 
 #include "bird.hpp"
+#include "environment_camera/environment_camera.hpp"
 
 using namespace cgp;
 
@@ -51,11 +52,11 @@ void Bird::setup() {
 }
 
 
-void Bird::display(cgp::scene_environment_basic_camera_spherical_coords environment) {
+void Bird::display(environment_camera environment) {
     draw(hierarchy, environment);
 }
 
-void Bird::display_wireframe(cgp::scene_environment_basic_camera_spherical_coords coords) {
+void Bird::display_wireframe(environment_camera coords) {
     draw_wireframe(hierarchy, coords);
 }
 

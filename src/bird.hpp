@@ -4,6 +4,7 @@
 #pragma once
 
 #include "cgp/cgp.hpp"
+#include "environment_camera/environment_camera.hpp"
 
 #ifndef PROJECT_BIRD_HPP
 #define PROJECT_BIRD_HPP
@@ -24,11 +25,11 @@ public:
 
     void setup();
 
-    void display(cgp::scene_environment_basic_camera_spherical_coords environment);
+    void display(environment_camera environment);
 
-    void display_wireframe(cgp::scene_environment_basic_camera_spherical_coords coords);
+    void display_wireframe(environment_camera coords);
 
-    void animate(float t);
+    environment_camera animate(float t);
 
     void rotate(cgp::rotation_transform rt);
     void translate(cgp::vec3 t);

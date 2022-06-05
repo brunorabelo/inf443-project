@@ -1,4 +1,5 @@
 #include "draw.hpp"
+#include "environment_camera/environment_camera.hpp"
 
 using namespace cgp;
 
@@ -9,8 +10,8 @@ GLuint initialize_reflection_buffer() {
 }
 
 void draw_reflectable(mesh_drawable const& drawable,
-	scene_environment_basic_camera_spherical_coords const& environment, GLuint const fbo,
-	bool reflect, bool compute_lighting)
+                      environment_camera environment, GLuint const fbo,
+                      bool reflect, bool compute_lighting)
 {
    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
@@ -49,7 +50,7 @@ void draw_reflectable(mesh_drawable const& drawable,
 }
 
 // Alpha blending needed for terrain ?
-void draw_terrain(mesh_drawable const& terrain_visual, scene_environment_basic_camera_spherical_coords const& environment, GLuint const fbo, bool reflect) {
+void draw_terrain(mesh_drawable const& terrain_visual, environment_camera environment, GLuint const fbo, bool reflect) {
 	// Enable use of alpha component as color blending for transparent elements
 //  alpha = current_color.alpha
 //  new color = previous_color * alpha + current_color * (1-alpha)
@@ -70,7 +71,7 @@ void draw_terrain(mesh_drawable const& terrain_visual, scene_environment_basic_c
 
 
 // This function blends reflections and refractions into one image
-void draw_water(mesh_drawable const& water_visual, scene_environment_basic_camera_spherical_coords const& environment)
+void draw_water(mesh_drawable const& water_visual, environment_camera environment)
 {
 	// Enable use of alpha component as color blending for transparent elements
 	//  alpha = current_color.alpha
