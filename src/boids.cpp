@@ -186,7 +186,7 @@ cgp::vec3 Boids::bound_position(Boid &boid) {
         new_speed.z += -damping_speed;
 
     if (boid.position.z < dimension_center.z)
-        new_speed.z += abs(dimension_center.z - boid.position.z) * 0.5f;
+        new_speed.z += cgp::abs(dimension_center.z - boid.position.z) * 0.5f;
 
     if (boid.position.z < min.z) {
         boid.position.z = min.z;
