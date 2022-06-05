@@ -9,10 +9,6 @@
 
 using namespace cgp;
 
-class keyboard {
-
-};
-
 struct custom_inputs_keyboard_parameters {
 
     bool shift;

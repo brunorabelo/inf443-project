@@ -15,7 +15,7 @@ struct environment_camera {
     cgp::vec3 light;  // stores the light position
 
     // Change the standard rotating camera to a "head camera" more appropriate to model free-flight (*)
-    cgp::camera_head camera;
+    cgp::camera_spherical_coordinates camera;
 
     environment_camera();
 };

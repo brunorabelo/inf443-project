@@ -5,7 +5,7 @@ using namespace cgp;
 
 void scene_structure::update_camera() {
     custom_inputs_keyboard_parameters const &keyboard = inputs.keyboard;
-    camera_head &camera = environment.camera;
+    camera_spherical_coordinates &camera = environment.camera;
 
     // The camera moves forward all the time
     //   We consider in this example a constant velocity, so the displacement is: velocity * dt * front-camera-vector
@@ -20,38 +20,29 @@ void scene_structure::update_camera() {
     inputs.mouse.position;
     vec2 curr = inputs.mouse.position.current;
 
-    float pitch = curr.y / camera_rotation_damping;
-    rotation_transform r_yaw, r_pitch;
+    float theta = curr.y / camera_rotation_damping;
 
-    float yaw = curr.x / camera_rotation_damping;
-    if (abs(curr.y) > 0.20) {
-        r_pitch = rotation_transform::from_axis_angle({1, 0, 0}, pitch);
+    float phi = curr.x / camera_rotation_damping;
+    if (!ImGui::IsMouseHoveringWindow() && (pow(curr.y, 2) + pow(curr.x, 2)) > 0.10) {
+        camera.manipulator_rotate_spherical_coordinates(phi, -theta);
+//        camera.manipulator_rotate_spherical_coordinates(phi, 0);
     }
-    if (abs(curr.x) > 0.20) {
-        mat3 m = inverse(camera.orientation_camera).matrix();
-//        camera.manipulator_rotate_roll_pitch_yaw(0, 0, -yaw);
-        r_yaw = rotation_transform::from_axis_angle(m * vec3{0, 0, -1}, yaw);
-    }
-    camera.orientation_camera = camera.orientation_camera * r_yaw * r_pitch;
-
-    float angle;
-    vec3 axis = {0, 0, 1};
 
 
     if (keyboard.up || keyboard.w_key) {
         if (keyboard.shift)
-            camera.position_camera += camera_speed * vec3{0, 0, 1};
-        else camera.position_camera += camera_speed * camera.front();
+            camera.center_of_rotation += camera_speed * vec3{0, 0, 1};
+        else camera.center_of_rotation += camera_speed * camera.front();
     }
     if (keyboard.down || keyboard.s_key) {
         if (keyboard.shift)
-            camera.position_camera -= camera_speed * vec3{0, 0, 1};
-        else camera.position_camera -= camera_speed * camera.front();
+            camera.center_of_rotation -= camera_speed * vec3{0, 0, 1};
+        else camera.center_of_rotation -= camera_speed * camera.front();
     }
     if (keyboard.left || keyboard.a_key)
-        camera.position_camera -= camera_speed * camera.right();
+        camera.center_of_rotation -= camera_speed * camera.right();
     if (keyboard.right || keyboard.d_key)
-        camera.position_camera += camera_speed * camera.right();
+        camera.center_of_rotation += camera_speed * camera.right();
 
 //    if (keyboard.right)
 //        camera.manipulator_rotate_roll_pitch_yaw(roll * dt, 0, 0);
@@ -64,10 +55,8 @@ void scene_structure::initialize() {
     // Basic set-up
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
-//    environment.camera.axis = camera_spherical_coordinates_axis::z;
-//    environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 0.0f});
-    environment.camera.position_camera = {60.0f, 0, 0};
-    environment.camera.manipulator_rotate_roll_pitch_yaw(-Pi / 2.0f, 0, Pi / 2.0f);
+    environment.camera.axis = camera_spherical_coordinates_axis::z;
+    environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 0.0f});
 
 
     // Import shaders & textures
