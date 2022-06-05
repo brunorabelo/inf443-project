@@ -34,7 +34,7 @@ void draw_reflectable(mesh_drawable const& drawable,
 	// ------- The crucial change with respect to draw() -------
 	// Our shader "reflectable" accepts a uniform that tells it to invert z coordinates
 	// and another that tells it to shut off lighting computations (e.g. for baked lighting)
-	opengl_uniform(drawable.shader, "reflect", reflect, false);
+	opengl_uniform(drawable.shader, "reflection", reflect, false);
 	opengl_uniform(drawable.shader, "compute_lighting", compute_lighting, false);
 
 	// Call draw function

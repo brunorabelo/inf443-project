@@ -38,16 +38,16 @@ uniform float specular_exp; // Specular exponent
 
 uniform mat4 view;       // View matrix (rigid transform) of the camera - to compute the camera position
 
-uniform bool reflect;          // Whether we're drawing a reflection or the real object
+uniform bool reflection;          // Whether we're drawing a reflection or the real object
 uniform bool compute_lighting = true; // Whether to do expensive lighting computations
 
 void main()
 {
 
 	// Clip reflections to water level
-	if(reflect && fragment.position.z > 0)
+	if(reflection && fragment.position.z > 0)
 		discard;
- 	if(!reflect && fragment.position.z < 0)
+ 	if(!reflection && fragment.position.z < 0)
  		discard;
 	
 	// Texture

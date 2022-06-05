@@ -28,14 +28,14 @@ uniform mat4 model;      // Model affine transform matrix associated to the curr
 uniform mat4 view;       // View matrix (rigid transform) of the camera
 uniform mat4 projection; // Projection (perspective or orthogonal) matrix of the camera
 
-uniform bool reflect = false;         // Whether we're drawing a reflection or the real object
+uniform bool reflection = false;    // Whether we're drawing a reflection or the real object
 
 void main()
 {
     // The position of the vertex in the world space
 	vec4 p = model * vec4(position, 1.0);
 
-	if(reflect)
+	if(reflection)
 		p.z = -p.z / 1.333f;
 
 	// The normal of the vertex in the world space
