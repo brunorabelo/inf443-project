@@ -18,13 +18,13 @@ struct gui_parameters {
     bool display_boids = true;
     bool display_cube = true;
     bool display_bird = true;
-	bool compute_lighting   = true;
-	bool display_water      = true;
-	bool display_cone = true;
-	bool reflect = true;
-	bool terrain_modeling_mode = false;
+    bool compute_lighting = true;
+    bool display_water = true;
+    bool display_cone = true;
+    bool reflect = true;
+    bool terrain_modeling_mode = false;
+    bool boids_modeling_mode = false;
 };
-
 
 
 // The structure of the custom scene
@@ -41,16 +41,16 @@ struct scene_structure {
     gui_parameters gui;                       // Standard GUI element storage
 
 
-	GLuint reflectable_shader;
-	GLuint water_shader;
+    GLuint reflectable_shader;
+    GLuint water_shader;
     GLuint fbo_reflection;
 
     cgp::mesh_drawable tree;
     cgp::mesh_drawable mushroom;
     cgp::mesh_drawable billboard;
-	cgp::mesh terrain;
-	cgp::mesh_drawable terrain_visual;
-	terrain_parameters tparams;
+    cgp::mesh terrain;
+    cgp::mesh_drawable terrain_visual;
+    terrain_parameters tparams;
 
     cgp::mesh water;
     cgp::mesh_drawable water_visual;
