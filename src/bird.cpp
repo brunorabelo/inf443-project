@@ -3,40 +3,43 @@
 //
 
 #include "bird.hpp"
+#include "draw.hpp"
 #include "environment_camera/environment_camera.hpp"
 
 using namespace cgp;
 
 
 void Bird::setup() {
+    GLuint shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
+
     float scale = 1;
     mesh m;
     m.push_back(mesh_primitive_arrow());
     m.push_back(mesh_primitive_ellipsoid({1, 1, 1.5}));
-    body.initialize(m, "body");
+    body.initialize(m, "body", shader);
     body.shading.color = {0, 0, 0};
     body.transform.scaling = scale;
 
-    head.initialize(mesh_primitive_sphere(0.9f), "head");
+    head.initialize(mesh_primitive_sphere(0.9f), "head", shader);
     head.shading.color = {0.0f, 0, 0};
     head.transform.scaling = scale;
 
-    wing_left.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_left");
+    wing_left.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_left", shader);
 //    wing_left.transform.translation = {0,0,1};
     wing_left.shading.color = {1.0f, 0, 0};
     wing_left.transform.scaling = scale;
 
-    wing_right.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_right");
+    wing_right.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_right", shader);
     wing_right.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
 //    wing_right.transform.translation = {-1,-1,1};
     wing_right.shading.color = {1, 1, 0};
     wing_right.transform.scaling = scale;
 
-    eye_left.initialize(mesh_primitive_sphere(0.2f), "eye_left");
+    eye_left.initialize(mesh_primitive_sphere(0.2f), "eye_left", shader);
     eye_left.shading.color = {0.2f, 0.2f, 0.2f};
     eye_left.transform.scaling = scale;
 
-    eye_right.initialize(mesh_primitive_sphere(0.2f), "eye_right");
+    eye_right.initialize(mesh_primitive_sphere(0.2f), "eye_right", shader);
     eye_right.shading.color = {0.2f, 0.2f, 0.2f};
     eye_right.transform.scaling = scale;
 
@@ -53,7 +56,8 @@ void Bird::setup() {
 
 
 void Bird::display(environment_camera environment) {
-    draw(hierarchy, environment);
+    draw_reflectable(hierarchy, environment, false);
+    draw_reflectable(hierarchy, environment, true);
 }
 
 void Bird::display_wireframe(environment_camera coords) {

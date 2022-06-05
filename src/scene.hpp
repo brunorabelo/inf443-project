@@ -13,15 +13,16 @@
 struct gui_parameters {
     bool display_frame = true;
     bool display_wireframe = false;
-    bool display_terrain = false;
+    bool display_terrain = true;
     bool display_tree = false;
     bool display_mushroom = false;
     bool display_billboard = false;
-    bool display_boids = true;
-    bool display_cube = true;
+    bool display_boids = false;
+    bool display_cube = false;
+    bool display_bird = false;
     bool compute_lighting = true;
     bool display_water = true;
-    bool display_cone = false;
+    bool display_cone = true;
     bool reflect = true;
     bool terrain_modeling_mode = false;
     bool boids_modeling_mode = false;
