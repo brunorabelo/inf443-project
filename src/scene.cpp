@@ -17,13 +17,12 @@ void scene_structure::update_camera() {
 //    float const pitch = 0.5f; // speed of the pitch
 //    float const roll = 0.7f; // speed of the roll
 
-    inputs.mouse.position;
-    vec2 curr = inputs.mouse.position.current;
+    vec2 curr_pos = inputs.mouse.position.current;
 
-    float theta = curr.y / camera_rotation_damping;
+    float theta = curr_pos.y / camera_rotation_damping;
 
-    float phi = curr.x / camera_rotation_damping;
-    if (!ImGui::IsMouseHoveringWindow() && (pow(curr.y, 2) + pow(curr.x, 2)) > 0.10) {
+    float phi = curr_pos.x / camera_rotation_damping;
+    if (!ImGui::IsMouseHoveringWindow() && (pow(curr_pos.y, 2) + pow(curr_pos.x, 2)) > 0.10) {
         camera.manipulator_rotate_spherical_coordinates(phi, -theta);
 //        camera.manipulator_rotate_spherical_coordinates(phi, 0);
     }
@@ -44,11 +43,6 @@ void scene_structure::update_camera() {
     if (keyboard.right || keyboard.d_key)
         camera.center_of_rotation += camera_speed * camera.right();
 
-//    if (keyboard.right)
-//        camera.manipulator_rotate_roll_pitch_yaw(roll * dt, 0, 0);
-//    if (keyboard.left)
-//        camera.manipulator_rotate_roll_pitch_yaw(-roll * dt, 0, 0);
-
 }
 
 void scene_structure::initialize() {
@@ -56,7 +50,7 @@ void scene_structure::initialize() {
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
     environment.camera.axis = camera_spherical_coordinates_axis::z;
-    environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 0.0f});
+    environment.camera.look_at({120.0f, -20.0f, 20.0f}, {0, -40, 0.0f});
 
 
     // Import shaders & textures
@@ -88,6 +82,15 @@ void scene_structure::initialize() {
 
     //initalize boids_vector
     boids.setup();
+
+    christ.initialize(mesh_load_file_obj("assets/christ.obj"));
+    christ.texture = opengl_load_texture_image("assets/marmore1.jpg");
+
+
+//    wing_left.shading.color = {1.0f, 0, 0};
+    christ.transform.scaling = 0.01;
+    christ.transform.translation = {0, -40, 3.0f};
+    christ.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
 }
 
 
@@ -121,6 +124,8 @@ void scene_structure::display() {
     }
 
     if (gui.display_boids) display_boids();
+
+    draw(christ, environment);
 
 }
 

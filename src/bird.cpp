@@ -15,33 +15,38 @@ void Bird::setup() {
     float scale = 1;
     mesh m;
     m.push_back(mesh_primitive_arrow());
-    m.push_back(mesh_primitive_ellipsoid({1, 1, 1.5}));
+    m.push_back(mesh_primitive_ellipsoid({0.8, 0.8, 2}));
+    auto bird_texture = opengl_load_texture_image("assets/bird.jpg");
     body.initialize(m, "body", shader);
-    body.shading.color = {0, 0, 0};
+    body.texture = opengl_load_texture_image("assets/bird2.jpg");
+//    body.shading.color = {0, 0, 0};
     body.transform.scaling = scale;
 
     head.initialize(mesh_primitive_sphere(0.9f), "head", shader);
-    head.shading.color = {0.0f, 0, 0};
+    head.texture = bird_texture;
     head.transform.scaling = scale;
 
     wing_left.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_left", shader);
+    wing_left.texture = bird_texture;
 //    wing_left.transform.translation = {0,0,1};
-    wing_left.shading.color = {1.0f, 0, 0};
     wing_left.transform.scaling = scale;
 
     wing_right.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_right", shader);
     wing_right.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
+    wing_right.texture = bird_texture;
 //    wing_right.transform.translation = {-1,-1,1};
-    wing_right.shading.color = {1, 1, 0};
     wing_right.transform.scaling = scale;
 
     eye_left.initialize(mesh_primitive_sphere(0.2f), "eye_left", shader);
-    eye_left.shading.color = {0.2f, 0.2f, 0.2f};
+    eye_left.shading.color = {1.0f, 1.0f, 1.0f};
     eye_left.transform.scaling = scale;
 
     eye_right.initialize(mesh_primitive_sphere(0.2f), "eye_right", shader);
-    eye_right.shading.color = {0.2f, 0.2f, 0.2f};
+    eye_right.shading.color = {1.0f, 1.0f, 1.0f};
     eye_right.transform.scaling = scale;
+
+//    tail.initialize(mesh_primitive_cylinder())
+
 
 
     // Generat the hierarchy

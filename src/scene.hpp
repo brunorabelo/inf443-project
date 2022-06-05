@@ -7,7 +7,7 @@
 #include "water.hpp"
 #include "terrain.hpp"
 #include "draw.hpp"
-#include "keyboard/keyboard.hpp"
+#include "inputs/inputs.hpp"
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
@@ -67,6 +67,8 @@ struct scene_structure {
     std::vector<cgp::vec3> billboard_position;
 
     Boids boids;
+
+    mesh_drawable christ;
 
 
     // Timer used for the interpolation of the position

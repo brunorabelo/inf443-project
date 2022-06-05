@@ -9,7 +9,7 @@
 #include "cgp/cgp.hpp"
 #include "bird.hpp"
 
-static int count = 0;
+static int count=0;
 
 class Boid {
 
