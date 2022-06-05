@@ -38,15 +38,17 @@ uniform float specular_exp; // Specular exponent
 
 uniform mat4 view;       // View matrix (rigid transform) of the camera - to compute the camera position
 
-//uniform bool reflect;    // Whether we're drawing a reflection or the real object
+uniform bool reflect;    // Whether we're drawing a reflection or the real object
 
 void main()
 {
 
-	// Make the object invisible below water level
-	if(fragment.position.z < 0) {
+	// Make the object invisible below water level, and its reflection invisible above
+	if(reflect && fragment.position.z > 0)
 		discard;
-	}
+	if(!reflect && fragment.position.z < 0)
+		discard;
+	
 
 	// Compute the position of the center of the camera
 	mat3 O = transpose(mat3(view));                   // get the orientation matrix

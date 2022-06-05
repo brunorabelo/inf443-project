@@ -17,6 +17,9 @@ void scene_structure::initialize()
 	GLuint const terrain_texture = opengl_load_texture_image("assets/texture_grass.jpg", GL_REPEAT, GL_REPEAT);
 	fbo_reflection = initialize_reflection_buffer();
 
+	// Background color
+	environment.background_color = { 0.529, 0.808, 0.922 };
+
 	// Initialize terrain
 	terrain = create_terrain_mesh(tparams);
 	terrain_visual.initialize(terrain, "terrain", reflectable_shader, terrain_texture);
@@ -26,6 +29,7 @@ void scene_structure::initialize()
 	water = create_water_mesh(100.0f);
 	water_visual.initialize(water, "water");
 	water_visual.shading.color = { 0.5f, 0.5f, 1.0f };
+	water_visual.shading.alpha = 0.5f;
 
 	// Test object for mesh_reflectable
 	cone = mesh_primitive_cone(1.0f, 2.0f, vec3(0.0f, 0.0f, -0.5f));
@@ -43,21 +47,23 @@ void scene_structure::display()
 
 	// Display the other elements:
 
-	draw(cone_visual, environment);
+	if(gui.display_cone)
+		draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, false);
 
-    draw_reflection(cone_visual, environment, GL_FRAMEBUFFER);
+	if(gui.reflect)
+		draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, true);
 
 	if (gui.display_terrain) {
-		if (gui.reflect)
-			opengl_uniform(reflectable_shader, "reflect", true, false);
+		draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, false);
 
-		draw(terrain_visual, environment);
+		if (gui.reflect)
+			draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, true);
 		if (gui.display_wireframe)
 			draw_wireframe(terrain_visual, environment);
 	}
 
 	if (gui.display_water)
-		draw(water_visual, environment);
+		draw_water(water_visual, environment);
 
 }
 

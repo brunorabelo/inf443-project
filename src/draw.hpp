@@ -5,9 +5,10 @@
 GLuint initialize_reflection_buffer();
 
 
-void draw_reflection(cgp::mesh_drawable const& drawable,
-                      cgp::scene_environment_basic_camera_spherical_coords const& environment, GLuint const fbo);
+void draw_reflectable(cgp::mesh_drawable const& drawable,
+                    cgp::scene_environment_basic_camera_spherical_coords const& environment,
+                    GLuint const fbo, bool reflect);
 
 
 
-void draw_water();
+void draw_water(cgp::mesh_drawable const& drawable, cgp::scene_environment_basic_camera_spherical_coords const& environment);
