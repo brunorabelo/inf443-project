@@ -33,7 +33,8 @@ struct scene_structure {
 	gui_parameters gui;                       // Standard GUI element storage
 
 	GLuint reflectable_shader;
-	GLuint fbo_reflection;
+	GLuint water_shader;
+    GLuint fbo_reflection;
 
 	cgp::mesh terrain;
 	cgp::mesh_drawable terrain_visual;

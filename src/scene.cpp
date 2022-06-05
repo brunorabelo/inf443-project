@@ -13,12 +13,14 @@ void scene_structure::initialize()
 	environment.camera.look_at({ 15.0f,6.0f,6.0f }, { 0,0,0 });
 
 	// Import shaders & textures
-	reflectable_shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
+    reflectable_shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
+    water_shader = opengl_load_shader("shaders/water/vert.glsl", "shaders/water/frag.glsl");
 	GLuint const terrain_texture = opengl_load_texture_image("assets/texture_grass.jpg", GL_REPEAT, GL_REPEAT);
 	fbo_reflection = initialize_reflection_buffer();
 
 	// Environment settings
 	environment.background_color = { 0.529, 0.808, 0.922 };
+    environment.light = {100, 0, 10};
 
 	// Initialize terrain
 	terrain = create_terrain_mesh(tparams);
@@ -27,7 +29,7 @@ void scene_structure::initialize()
 
 	// Initialize water
 	water = create_water_mesh(100.0f);
-	water_visual.initialize(water, "water");
+	water_visual.initialize(water, "water", water_shader);
 	water_visual.shading.color = { 0.5f, 0.5f, 1.0f };
 	water_visual.shading.alpha = 0.5f;
 
