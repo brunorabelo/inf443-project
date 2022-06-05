@@ -19,6 +19,10 @@ endif()
 #    You may want to change this definition in case of specific file structure
 file(GLOB_RECURSE src_files ${CMAKE_CURRENT_LIST_DIR}/src/*.[ch]pp ${CMAKE_CURRENT_LIST_DIR}/shaders/*.glsl)
 
+#include(${CMAKE_CURRENT_LIST_DIR}/src/sources.cmake)
+
+#message(STATUS "Source code filenames: ${src_files}")
+
 
 # Generate the executable_name from the current directory name
 get_filename_component(executable_name ${CMAKE_CURRENT_LIST_DIR} NAME)

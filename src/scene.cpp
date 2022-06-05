@@ -1,7 +1,5 @@
 #include "scene.hpp"
-
-#include "terrain.hpp"
-#include "tree.hpp"
+#include "draw.hpp"
 
 using namespace cgp;
 
@@ -12,35 +10,38 @@ void scene_structure::initialize() {
     environment.camera.axis = camera_spherical_coordinates_axis::z;
     environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 0.0f});
 
-    // Initialize the terrain
-    int N_terrain_samples = 200;
-    float terrain_length = 20;
-    mesh const terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
-    terrain.initialize(terrain_mesh, "terrain");
-    terrain.shading.color = {0.6f, 0.85f, 0.5f};
-    terrain.shading.phong.specular = 0.0f; // non-specular terrain material
-    terrain.texture = opengl_load_texture_image("assets/texture_grass.jpg", GL_REPEAT, GL_REPEAT);
+    // Import shaders & textures
+    reflectable_shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
+    water_shader = opengl_load_shader("shaders/water/vert.glsl", "shaders/water/frag.glsl");
+    GLuint const terrain_texture = opengl_load_texture_image("assets/texture_grass.jpg", GL_REPEAT, GL_REPEAT);
+    fbo_reflection = initialize_reflection_buffer();
 
-    // Initialize the trees
-    tree.initialize(create_tree(), "Tree");
-    tree_position = generate_positions_on_terrain(100, terrain_length);
 
-    // Initialize the mushrooms
-    mushroom.initialize(create_mushroom(), "Mushroom");
-    mushroom_position = generate_positions_on_terrain(75, terrain_length);
+    // Environment settings
+    environment.background_color = {0.529, 0.808, 0.922};
+    environment.light = {100, 0, 10};
 
-    // Initialize the grass of billboards
-    billboard.initialize(mesh_primitive_quadrangle({-0.5f, 0, 0}, {0.5f, 0, 0}, {0.5f, 0, 1}, {-0.5f, 0, 1}), "Quad");
-    billboard.texture = opengl_load_texture_image("assets/grass.png");
-    billboard.shading.phong = {0.4f, 0.6f, 0, 1};
-    billboard.transform.scaling = 0.6f;
-    billboard_position = generate_positions_on_terrain(75, terrain_length);
+    // Initialize terrain
+    terrain = create_terrain_mesh(tparams);
+    terrain_visual.initialize(terrain, "terrain", reflectable_shader, terrain_texture);
+    update_terrain(terrain, terrain_visual, tparams);
+
+    // Initialize water
+    water = create_water_mesh(100.0f);
+    water_visual.initialize(water, "water", water_shader);
+    water_visual.shading.color = {0.5f, 0.5f, 1.0f};
+    water_visual.shading.alpha = 0.5f;
+
+    // Test object for reflectable shader
+    cone = mesh_primitive_cone(20.0f, 40.0f, vec3(0.0f, 0.0f, 35.0f), vec3(0, 0, -1));
+    cone_visual.initialize(cone, "cone", reflectable_shader);
 
     //initalize boids_vector
     boids.setup();
 
     bird.setup();
 }
+
 
 void scene_structure::display() {
 
@@ -50,47 +51,33 @@ void scene_structure::display() {
         draw(global_frame, environment);
 
 
-    // Display the other elements:
+    if (gui.display_cone) {
+        draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
 
-    if (gui.display_terrain) {
-        draw(terrain, environment);
-        if (gui.display_wireframe)
-            draw_wireframe(terrain, environment);
+        if (gui.reflect)
+            draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
     }
 
-    if (gui.display_tree) display_trees();
-    if (gui.display_mushroom) display_mushroom();
-    if (gui.display_billboard) display_billboard();
+
+    if (gui.display_water)
+        draw_water(water_visual, environment);
+
+    if (gui.display_terrain) {
+        if (gui.reflect)
+            draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
+
+        draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
+
+        if (gui.display_wireframe)
+            draw_wireframe(terrain_visual, environment);
+    }
+
     if (gui.display_boids) display_boids();
 
     if (gui.display_bird)
         bird.display(environment);
     if (gui.display_wireframe)
         bird.display_wireframe(environment);
-
-}
-
-
-void scene_structure::display_trees() {
-    vec3 const offset = {0, 0, 0.05f};
-    for (vec3 position: tree_position) {
-        tree.transform.translation = position - offset;
-        draw(tree, environment);
-
-        if (gui.display_wireframe)
-            draw_wireframe(tree, environment);
-    }
-}
-
-void scene_structure::display_mushroom() {
-    vec3 const offset = {0, 0, 0.02f};
-    for (vec3 position: mushroom_position) {
-        mushroom.transform.translation = position - offset;
-        draw(mushroom, environment);
-
-        if (gui.display_wireframe)
-            draw_wireframe(mushroom, environment);
-    }
 }
 
 void scene_structure::display_billboard() {
@@ -123,6 +110,7 @@ void scene_structure::display_billboard() {
     }
 }
 
+
 void scene_structure::animate() {
 
     // Update the current time
@@ -151,13 +139,39 @@ void scene_structure::display_gui() {
     ImGui::Checkbox("Frame", &gui.display_frame);
     ImGui::Checkbox("Wireframe", &gui.display_wireframe);
 
-    ImGui::Checkbox("terrain", &gui.display_terrain);
-    ImGui::Checkbox("tree", &gui.display_tree);
-    ImGui::Checkbox("mushroom", &gui.display_mushroom);
-    ImGui::Checkbox("billboard", &gui.display_billboard);
+    ImGui::Checkbox("Compute lighting", &gui.compute_lighting);
+
+    ImGui::Checkbox("Display terrain", &gui.display_terrain);
+    ImGui::Checkbox("Display water", &gui.display_water);
+    ImGui::Checkbox("Display cone", &gui.display_cone);
+
+    ImGui::Checkbox("Reflect", &gui.reflect);
+
+    if(gui.display_terrain)
+        ImGui::Checkbox("Terrain modeling mode", &gui.terrain_modeling_mode);
+
+    ImGui::SliderFloat("Position Z", &terrain_visual.transform.translation.z, -30.0f, 30.0f);
+    if(gui.display_cone)
+        ImGui::SliderFloat("Cone translation", &cone_visual.transform.translation.z, -30.0f, 60.0f);
+
+    if (gui.display_terrain && gui.terrain_modeling_mode) {
+        bool update = false;
+        update |= ImGui::SliderFloat("Persistance", &tparams.persistency, 0.1f, 0.6f);
+        update |= ImGui::SliderFloat("Frequency gain", &tparams.frequency_gain, 1.5f, 2.5f);
+        update |= ImGui::SliderInt("Octave", &tparams.octave, 1, 8);
+        update |= ImGui::SliderFloat("Height", &tparams.terrain_height, 10.0f, 50.0f);
+        update |= ImGui::SliderFloat("Scale", &tparams.scale, 0.1f, 2.0f);
+        update |= ImGui::SliderFloat("Perlin offset X", &tparams.perlin_offsetx, -2.0f, 2.0f);
+        update |= ImGui::SliderFloat("Perlin offset Y", &tparams.perlin_offsety, -2.0f, 2.0f);
+        update |= ImGui::SliderFloat("Offset Z", &tparams.offsetz, -50.0f, 10.0f);
+
+        if (update)// if any slider has been changed - then update the terrain
+            update_terrain(terrain, terrain_visual, tparams);
+    }
+
+
     ImGui::Checkbox("boids_vector", &gui.display_boids);
     ImGui::Checkbox("cube", &gui.display_cube);
-
     ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
     ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
     ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
