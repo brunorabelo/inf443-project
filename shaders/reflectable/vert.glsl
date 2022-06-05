@@ -27,16 +27,16 @@ out struct fragment_data
 uniform mat4 model;      // Model affine transform matrix associated to the current shape
 uniform mat4 view;       // View matrix (rigid transform) of the camera
 uniform mat4 projection; // Projection (perspective or orthogonal) matrix of the camera
-uniform bool reflect = false;       // Whether we're drawing a reflection or the real object
+
+uniform bool reflect = false;         // Whether we're drawing a reflection or the real object
 
 void main()
 {
-	vec3 pos = position;
-	if(reflect)
-		pos.z = -pos.z;
-
     // The position of the vertex in the world space
-	vec4 p = model * vec4(pos, 1.0);
+	vec4 p = model * vec4(position, 1.0);
+
+	if(reflect)
+		p.z = -p.z / 1.333f;
 
 	// The normal of the vertex in the world space
 	vec4 n = model * vec4(normal, 0.0);

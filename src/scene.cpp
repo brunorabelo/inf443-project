@@ -17,7 +17,7 @@ void scene_structure::initialize()
 	GLuint const terrain_texture = opengl_load_texture_image("assets/texture_grass.jpg", GL_REPEAT, GL_REPEAT);
 	fbo_reflection = initialize_reflection_buffer();
 
-	// Background color
+	// Environment settings
 	environment.background_color = { 0.529, 0.808, 0.922 };
 
 	// Initialize terrain
@@ -31,8 +31,8 @@ void scene_structure::initialize()
 	water_visual.shading.color = { 0.5f, 0.5f, 1.0f };
 	water_visual.shading.alpha = 0.5f;
 
-	// Test object for mesh_reflectable
-	cone = mesh_primitive_cone(1.0f, 2.0f, vec3(0.0f, 0.0f, -0.5f));
+	// Test object for reflectable shader
+	cone = mesh_primitive_cone(20.0f, 40.0f, vec3(0.0f, 0.0f, 35.0f), vec3(0, 0, -1));
 	cone_visual.initialize(cone, "cone", reflectable_shader);
 }
 
@@ -47,23 +47,27 @@ void scene_structure::display()
 
 	// Display the other elements:
 
-	if(gui.display_cone)
-		draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, false);
-
-	if(gui.reflect)
-		draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, true);
-
-	if (gui.display_terrain) {
-		draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, false);
+	if (gui.display_cone) {
+		draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
 
 		if (gui.reflect)
-			draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, true);
+			draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
+	}
+
+
+	if (gui.display_water)
+		draw_water(water_visual, environment);
+
+	if (gui.display_terrain) {
+		if (gui.reflect)
+			draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
+
+		draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
+
 		if (gui.display_wireframe)
 			draw_wireframe(terrain_visual, environment);
 	}
 
-	if (gui.display_water)
-		draw_water(water_visual, environment);
 
 }
 
@@ -71,15 +75,22 @@ void scene_structure::display_gui()
 {
 	ImGui::Checkbox("Frame", &gui.display_frame);
 	ImGui::Checkbox("Wireframe", &gui.display_wireframe);
+	ImGui::Checkbox("Compute lighting", &gui.compute_lighting);
 
 	ImGui::Checkbox("Display terrain", &gui.display_terrain);
 	ImGui::Checkbox("Display water", &gui.display_water);
+	ImGui::Checkbox("Display cone", &gui.display_cone);
 
 	ImGui::Checkbox("Reflect", &gui.reflect);
 
-	ImGui::Checkbox("Terrain modeling mode", &gui.terrain_modeling_mode);
+	if(gui.display_terrain)
+		ImGui::Checkbox("Terrain modeling mode", &gui.terrain_modeling_mode);
 
-	if (gui.terrain_modeling_mode) {
+	ImGui::SliderFloat("Position Z", &terrain_visual.transform.translation.z, -30.0f, 30.0f);
+	if(gui.display_cone)
+		ImGui::SliderFloat("Cone translation", &cone_visual.transform.translation.z, -30.0f, 60.0f);
+
+	if (gui.display_terrain && gui.terrain_modeling_mode) {
 		bool update = false;
 		update |= ImGui::SliderFloat("Persistance", &tparams.persistency, 0.1f, 0.6f);
 		update |= ImGui::SliderFloat("Frequency gain", &tparams.frequency_gain, 1.5f, 2.5f);

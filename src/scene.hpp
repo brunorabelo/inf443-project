@@ -9,9 +9,10 @@
 struct gui_parameters {
 	bool display_frame      = false;
 	bool display_wireframe  = false;
+	bool compute_lighting   = true;
 	bool display_terrain    = true;
 	bool display_water      = true;
-	bool display_cone = false;
+	bool display_cone = true;
 	bool reflect = true;
 	bool terrain_modeling_mode = false;
 };

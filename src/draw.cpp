@@ -8,7 +8,9 @@ GLuint initialize_reflection_buffer() {
 	return fbo;
 }
 
-void draw_reflectable(mesh_drawable const& drawable, scene_environment_basic_camera_spherical_coords const& environment, GLuint const fbo, bool reflect)
+void draw_reflectable(mesh_drawable const& drawable,
+	scene_environment_basic_camera_spherical_coords const& environment, GLuint const fbo,
+	bool reflect, bool compute_lighting)
 {
    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
@@ -30,8 +32,10 @@ void draw_reflectable(mesh_drawable const& drawable, scene_environment_basic_cam
 	opengl_uniform(drawable.shader, "image_texture", 0);  opengl_check;
 
 	// ------- The crucial change with respect to draw() -------
-	//Our shader "reflectable" accepts a uniform that tells it to invert z coordinates
+	// Our shader "reflectable" accepts a uniform that tells it to invert z coordinates
+	// and another that tells it to shut off lighting computations (e.g. for baked lighting)
 	opengl_uniform(drawable.shader, "reflect", reflect, false);
+	opengl_uniform(drawable.shader, "compute_lighting", compute_lighting, false);
 
 	// Call draw function
 	assert_cgp(drawable.number_triangles > 0, "Try to draw mesh_drawable with 0 triangles [name:" + drawable.name + "]"); opengl_check;
@@ -42,6 +46,26 @@ void draw_reflectable(mesh_drawable const& drawable, scene_environment_basic_cam
 	// Clean buffers
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+// Alpha blending needed for terrain ?
+void draw_terrain(mesh_drawable const& terrain_visual, scene_environment_basic_camera_spherical_coords const& environment, GLuint const fbo, bool reflect) {
+	// Enable use of alpha component as color blending for transparent elements
+//  alpha = current_color.alpha
+//  new color = previous_color * alpha + current_color * (1-alpha)
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Disable depth buffer writing
+	//  - Transparent elements cannot use depth buffer
+	//  - They are supposed to be display from furest to nearest elements
+	glDepthMask(false);
+
+	draw_reflectable(terrain_visual, environment, fbo, reflect);
+
+	// Don't forget to re-activate the depth-buffer write
+	glDepthMask(true);
+	glDisable(GL_BLEND);
 }
 
 
