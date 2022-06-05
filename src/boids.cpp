@@ -30,9 +30,10 @@ void Boids::addBoid(vec3 position = {0, 0, 1}, vec3 velocity = {0, 0, 0}) {
 Boids::Boids(float size, cgp::vec3 center) {
     this->dimension_size = size;
     this->dimension_center = center;
+    this->initial_dimension_size = size;
 }
 
-Boids::Boids() : Boids(80.0f, {0, 0, 5.0f}) {};
+Boids::Boids() : Boids(80.0f, {0, 0, 40.0f}) {};
 
 
 void Boids::setup() {

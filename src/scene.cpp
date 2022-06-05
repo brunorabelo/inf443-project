@@ -21,6 +21,7 @@ void scene_structure::initialize() {
     environment.background_color = {0.529, 0.808, 0.922};
     environment.light = {100, 0, 10};
 
+
     // Initialize terrain
     terrain = create_terrain_mesh(tparams);
     terrain_visual.initialize(terrain, "terrain", reflectable_shader, terrain_texture);
@@ -52,10 +53,10 @@ void scene_structure::display() {
 
 
     if (gui.display_cone) {
-        draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
+        draw_reflectable(cone_visual, environment, false, gui.compute_lighting);
 
         if (gui.reflect)
-            draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
+            draw_reflectable(cone_visual, environment, true, gui.compute_lighting);
     }
 
 
@@ -64,9 +65,9 @@ void scene_structure::display() {
 
     if (gui.display_terrain) {
         if (gui.reflect)
-            draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
+            draw_reflectable(terrain_visual, environment, true, gui.compute_lighting);
 
-        draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
+        draw_reflectable(terrain_visual, environment, false, gui.compute_lighting);
 
         if (gui.display_wireframe)
             draw_wireframe(terrain_visual, environment);
@@ -123,7 +124,8 @@ void scene_structure::display_boids() {
 
     for (Boid &boid: boids.boids_vector) {
         boid.update();
-        draw(boid.bird.hierarchy, environment);
+        //draw(boid.bird.hierarchy, environment);
+        boid.bird.display(environment);
 
         if (gui.display_wireframe) {
             draw_wireframe(boid.bird.hierarchy, environment);
