@@ -46,9 +46,10 @@ void scene_structure::initialize() {
 
 
 //    wing_left.shading.color = {1.0f, 0, 0};
-    christ.transform.scaling = 0.01;
+    christ.transform.scaling = 0.005;
     christ.transform.translation = {0, -40, 3.0f};
     christ.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
+
 }
 
 
@@ -131,6 +132,8 @@ void scene_structure::display(float dt, float total_time) {
     if (gui.display_boids) boids.display(environment, gui.display_wireframe, gui.display_cube);
 
     draw(christ, environment);
+
+    draw(cloud, environment);
 
 }
 
