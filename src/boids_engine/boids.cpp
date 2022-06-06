@@ -3,28 +3,15 @@
 //
 
 #include "boids.hpp"
-
+#include "bird.hpp"
 
 using namespace cgp;
 
-bool Boid::isEqual(Boid b) {
-    return this->name.compare(b.name) == 0;
-}
 
-Boid::Boid(cgp::vec3 position, cgp::vec3 velocity, float perch_timer = 10.0f) {
-    this->position = position;
-    this->velocity = velocity;
-    this->normal = {0, 0, 1};
-    this->name = "boid" + std::to_string(count++);
-    this->perch_timer = perch_timer;
-//    mesh m = mesh_primitive_cone(0.5f, 1.0f, {0, 0, -0.25}, normal);
-//    m.push_back(mesh_primitive_frame());
-//    this->mesh_drawable.initialize(m, name);
-    bird.setup();
-}
 
 void Boids::addBoid(vec3 position = {0, 0, 1}, vec3 velocity = {0, 0, 0}) {
-    boids_vector.emplace_back(position, velocity);
+
+    boids_vector.emplace_back(Boid(position, velocity, 10.0f));
 }
 
 Boids::Boids(float size, cgp::vec3 center) {
@@ -77,10 +64,6 @@ vec3 Boids::limit_velocity(vec3 velocity) {
     return new_speed;
 }
 
-void Boid::update() {
-    bird.rotate(rotation_transform::between_vector({0, 0, 1}, normal));
-    bird.translate(this->position);
-}
 
 void Boids::update() {
     cube_mesh_drawable.transform.scaling = dimension_size / initial_dimension_size;
@@ -89,9 +72,7 @@ void Boids::update() {
 void Boids::animate(float d, float time) {
     vec3 v1, v2, v3;
 
-
     for (auto &b: boids_vector) {
-
         if (b.perching) {
             if (b.perch_timer > 0) {
                 b.perch_timer -= d;
@@ -101,7 +82,6 @@ void Boids::animate(float d, float time) {
                 b.perch_timer = perch_timer;
             }
         }
-
         v1 = rule1(b);
         v2 = rule2(b);
         v3 = rule3(b);
@@ -116,7 +96,8 @@ void Boids::animate(float d, float time) {
         b.position += b.velocity * d;
         b.normal = b.velocity / norm(b.velocity);
 
-        b.bird.animate(time, b.velocity.z);
+        b.animate(time, b.velocity.z);
+
     }
 }
 
@@ -195,4 +176,16 @@ cgp::vec3 Boids::bound_position(Boid &boid) {
     }
 
     return new_speed;
+}
+
+void Boids::display(environment_camera environment, bool wireframe = false, bool cube = false) {
+    update();
+    for (Boid &boid: boids_vector) {
+        boid.update();
+        boid.display(environment, wireframe);
+    }
+    if (cube) {
+        draw_wireframe(cube_mesh_drawable, environment);
+    }
+
 }

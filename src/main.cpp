@@ -59,8 +59,9 @@ int main(int, char *argv[]) {
         scene.update_camera();
 
         // Call the display of the scene
-        scene.display();
-        scene.animate();
+        float dt = scene.timer.update();
+        float t = scene.timer.t;
+        scene.display(dt, t);
 
         // End of ImGui display and handle GLFW events
         helper_common.frame_end(window);

@@ -5,12 +5,13 @@
 
 #include "cgp/cgp.hpp"
 #include "environment_camera/environment_camera.hpp"
+#include "boids_engine/boid_object.hpp"
 
 #ifndef PROJECT_BIRD_HPP
 #define PROJECT_BIRD_HPP
 
 
-class Bird {
+class Bird : public boid_object {
 
     cgp::mesh_drawable body;
     cgp::mesh_drawable head;
@@ -19,21 +20,22 @@ class Bird {
     cgp::mesh_drawable eye_right;
     cgp::mesh_drawable eye_left;
     cgp::mesh_drawable tail;
+    cgp::hierarchy_mesh_drawable hierarchy;
+
+    void display_wireframe(environment_camera coords);
 
 public:
-    cgp::hierarchy_mesh_drawable hierarchy;
+
 
     void setup();
 
-    void display(environment_camera environment);
+    void display(environment_camera environment, bool wireframe);
 
-    void display_wireframe(environment_camera coords);
+    void animate(float t, float speed_z);
 
     void rotate(cgp::rotation_transform rt);
 
     void translate(cgp::vec3 t);
-
-    void animate(float t, float speed_z);
 };
 
 

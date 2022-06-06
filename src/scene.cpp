@@ -38,7 +38,7 @@ void scene_structure::initialize() {
     cone = mesh_primitive_cone(20.0f, 40.0f, vec3(0.0f, 0.0f, 35.0f), vec3(0, 0, -1));
     cone_visual.initialize(cone, "cone", reflectable_shader);
 
-    //initalize boids_vector
+    //initalize vector
     boids.setup();
 
     christ.initialize(mesh_load_file_obj("assets/christ.obj"));
@@ -84,9 +84,7 @@ void scene_structure::update_camera() {
 
 }
 
-
-void scene_structure::display() {
-
+void scene_structure::display(float dt, float total_time) {
     // Basic elements of the scene
     environment.light = environment.camera.position();
     if (gui.display_frame)
@@ -100,10 +98,11 @@ void scene_structure::display() {
             draw_reflectable(cone_visual, environment, true, gui.compute_lighting);
     }
 
-
+    // display water
     if (gui.display_water)
         draw_water(water_visual, environment);
 
+    // display terrain
     if (gui.display_terrain) {
         if (gui.reflect)
             draw_reflectable(terrain_visual, environment, true, gui.compute_lighting);
@@ -114,37 +113,14 @@ void scene_structure::display() {
             draw_wireframe(terrain_visual, environment);
     }
 
-    if (gui.display_boids) display_boids();
+
+    // display boids
+    boids.animate(dt, total_time);
+    if (gui.display_boids) boids.display(environment, gui.display_wireframe, gui.display_cube);
 
     draw(christ, environment);
 
 }
-
-
-void scene_structure::animate() {
-
-    // Update the current time
-    float dt = timer.update();
-    boids.animate(dt, timer.t);
-}
-
-void scene_structure::display_boids() {
-    boids.update();
-
-    for (Boid &boid: boids.boids_vector) {
-        boid.update();
-        //draw(boid.bird.hierarchy, environment);
-        boid.bird.display(environment);
-
-        if (gui.display_wireframe) {
-            draw_wireframe(boid.bird.hierarchy, environment);
-        }
-    }
-    if (gui.display_cube) {
-        draw_wireframe(boids.cube_mesh_drawable, environment);
-    }
-}
-
 
 void scene_structure::display_gui() {
     ImGui::Checkbox("Frame", &gui.display_frame);
@@ -206,6 +182,7 @@ void scene_structure::display_gui() {
 }
 
 void scene_structure::reset_camera() {
+    // reset the camer to the initial state
     environment.camera.axis = camera_spherical_coordinates_axis::z;
     environment.camera.look_at({120.0f, -20.0f, 20.0f}, {0, -40, 0.0f});
 }

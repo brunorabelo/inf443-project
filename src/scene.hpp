@@ -2,8 +2,7 @@
 
 #include "cgp/cgp.hpp"
 #include "environment_camera/environment_camera.hpp"
-#include "boids.hpp"
-#include "bird.hpp"
+#include "boids_engine/boids.hpp"
 #include "water.hpp"
 #include "terrain.hpp"
 #include "draw.hpp"
@@ -70,28 +69,21 @@ struct scene_structure {
 
     mesh_drawable christ;
 
-
     // Timer used for the interpolation of the position
     cgp::timer_event_periodic timer;
 
     float camera_speed = 2.0f; // camera speed
     float camera_rotation_damping = 50.0f;
 
-
-    void update_camera();
-
-
-    void display_boids();
-
-
     // ****************************** //
     // Functions
     // ****************************** //
 
     void initialize();  // Standard initialization to be called before the animation loop
-    void animate();
 
-    void display();     // The frame display to be called within the animation loop
+    void update_camera(); //to update the camera position and orientation in response to user input
+
+    void display(float dt, float total_time);     // The frame display to be called within the animation loop
     void display_gui(); // The display of the GUI, also called within the animation loop
 
 

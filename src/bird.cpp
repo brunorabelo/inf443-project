@@ -60,9 +60,12 @@ void Bird::setup() {
 }
 
 
-void Bird::display(environment_camera environment) {
+void Bird::display(environment_camera environment, bool wireframe) {
     draw_reflectable(hierarchy, environment, false);
     draw_reflectable(hierarchy, environment, true);
+
+    if (wireframe)
+        draw_wireframe(hierarchy, environment);
 }
 
 void Bird::display_wireframe(environment_camera coords) {
@@ -70,7 +73,6 @@ void Bird::display_wireframe(environment_camera coords) {
 }
 
 void Bird::animate(float t, float speed_z) {
-
     float phase = 0;
     if (speed_z < 0)
         return;
