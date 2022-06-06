@@ -131,9 +131,8 @@ void scene_structure::display(float dt, float total_time) {
     boids.animate(dt, total_time);
     if (gui.display_boids) boids.display(environment, gui.display_wireframe, gui.display_cube);
 
-    draw(christ, environment);
+//    draw(christ, environment);
 
-    draw(cloud, environment);
 
 }
 
