@@ -43,6 +43,8 @@ struct scene_structure {
     GLuint water_shader;
     GLuint fbo_reflection;
 
+    cgp::skybox_drawable skybox;
+
     cgp::mesh_drawable tree;
     cgp::mesh_drawable mushroom;
     cgp::mesh_drawable billboard;

@@ -4,6 +4,8 @@
 using namespace cgp;
 
 void scene_structure::initialize() {
+
+    skybox.initialize("assets/skybox/");
     // Basic set-up
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
@@ -29,7 +31,7 @@ void scene_structure::initialize() {
     update_terrain(terrain, terrain_visual, tparams);
 
     // Initialize water
-    water = create_water_mesh(100.0f);
+    water = create_water_mesh(200.0f);
     water_visual.initialize(water, "water", water_shader);
     water_visual.shading.color = {0.5f, 0.5f, 1.0f};
     water_visual.shading.alpha = 0.5f;
@@ -61,6 +63,8 @@ void scene_structure::update_camera() {
     // defining the angles the camera will rotate given the mouse pointer coordinates
     vec2 mouse_position = inputs.mouse.position.current;
 
+    float sensibility = 0.5;
+
     float theta = mouse_position.y / camera_rotation_damping;
     float phi = mouse_position.x / camera_rotation_damping;
     if (gui.mouse_direction && !inputs.mouse.on_gui && (pow(mouse_position.y, 2) + pow(mouse_position.x, 2)) > 0.10) {
@@ -72,25 +76,25 @@ void scene_structure::update_camera() {
         if (keyboard.shift)
             camera.center_of_rotation += camera_speed * vec3{0, 0, 1};
         else if (keyboard.ctrl)
-            camera.manipulator_rotate_spherical_coordinates(0, camera_speed / camera_rotation_damping);
+            camera.manipulator_rotate_spherical_coordinates(0, sensibility / camera_rotation_damping);
         else camera.center_of_rotation += camera_speed * camera.front();
     }
     if (keyboard.down || keyboard.s_key) {
         if (keyboard.shift)
             camera.center_of_rotation -= camera_speed * vec3{0, 0, 1};
         else if (keyboard.ctrl)
-            camera.manipulator_rotate_spherical_coordinates(0, -camera_speed / camera_rotation_damping);
+            camera.manipulator_rotate_spherical_coordinates(0, -sensibility / camera_rotation_damping);
         else camera.center_of_rotation -= camera_speed * camera.front();
     }
     if (keyboard.left || keyboard.a_key) {
         if (keyboard.ctrl)
-            camera.manipulator_rotate_spherical_coordinates(camera_speed / camera_rotation_damping, 0);
+            camera.manipulator_rotate_spherical_coordinates(sensibility / camera_rotation_damping, 0);
         else
             camera.center_of_rotation -= camera_speed * camera.right();
     }
     if (keyboard.right || keyboard.d_key) {
         if (keyboard.ctrl)
-            camera.manipulator_rotate_spherical_coordinates(-camera_speed / camera_rotation_damping, 0);
+            camera.manipulator_rotate_spherical_coordinates(-sensibility / camera_rotation_damping, 0);
         else
             camera.center_of_rotation += camera_speed * camera.right();
     }
@@ -98,6 +102,8 @@ void scene_structure::update_camera() {
 }
 
 void scene_structure::display(float dt, float total_time) {
+    draw(skybox, environment);
+
     // Basic elements of the scene
     environment.light = environment.camera.position();
     if (gui.display_frame)
@@ -182,16 +188,16 @@ void scene_structure::display_gui() {
         ImGui::Checkbox("Boids modeling mode", &gui.boids_modeling_mode);
     if (gui.display_boids && gui.boids_modeling_mode) {
 
-    ImGui::Checkbox("boids_vector", &gui.display_boids);
-    ImGui::Checkbox("cube", &gui.display_cube);
-    ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
-    ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
-    ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
-    ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
-    ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
-    ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
-    ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
-    ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
+        ImGui::Checkbox("boids_vector", &gui.display_boids);
+        ImGui::Checkbox("cube", &gui.display_cube);
+        ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
+        ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
+        ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
+        ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
+        ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
+        ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
+        ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
+        ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
 
     }
 
@@ -203,6 +209,6 @@ void scene_structure::reset_camera() {
     environment.camera.look_at({120.0f, -20.0f, 20.0f}, {0, -40, 0.0f});
 }
 
-}
+
 
 
