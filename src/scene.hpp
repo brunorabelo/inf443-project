@@ -95,6 +95,7 @@ struct scene_structure {
     void display_gui(); // The display of the GUI, also called within the animation loop
 
 
+    void reset_camera();
 };
 
 

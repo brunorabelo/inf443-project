@@ -3,48 +3,6 @@
 
 using namespace cgp;
 
-void scene_structure::update_camera() {
-    custom_inputs_keyboard_parameters const &keyboard = inputs.keyboard;
-    camera_spherical_coordinates &camera = environment.camera;
-
-    // The camera moves forward all the time
-    //   We consider in this example a constant velocity, so the displacement is: velocity * dt * front-camera-vector
-//    vec3 const forward_displacement = camera_speed * 0.1f * camera.front();
-//    camera.position_camera += forward_displacement;
-
-    // The camera rotates if we press on the arrow keys
-    //  The rotation is only applied to the roll and pitch degrees of freedom.
-//    float const pitch = 0.5f; // speed of the pitch
-//    float const roll = 0.7f; // speed of the roll
-
-    vec2 curr_pos = inputs.mouse.position.current;
-
-    float theta = curr_pos.y / camera_rotation_damping;
-
-    float phi = curr_pos.x / camera_rotation_damping;
-    if (!ImGui::IsMouseHoveringWindow() && (pow(curr_pos.y, 2) + pow(curr_pos.x, 2)) > 0.10) {
-        camera.manipulator_rotate_spherical_coordinates(phi, -theta);
-//        camera.manipulator_rotate_spherical_coordinates(phi, 0);
-    }
-
-
-    if (keyboard.up || keyboard.w_key) {
-        if (keyboard.shift)
-            camera.center_of_rotation += camera_speed * vec3{0, 0, 1};
-        else camera.center_of_rotation += camera_speed * camera.front();
-    }
-    if (keyboard.down || keyboard.s_key) {
-        if (keyboard.shift)
-            camera.center_of_rotation -= camera_speed * vec3{0, 0, 1};
-        else camera.center_of_rotation -= camera_speed * camera.front();
-    }
-    if (keyboard.left || keyboard.a_key)
-        camera.center_of_rotation -= camera_speed * camera.right();
-    if (keyboard.right || keyboard.d_key)
-        camera.center_of_rotation += camera_speed * camera.right();
-
-}
-
 void scene_structure::initialize() {
     // Basic set-up
     // ***************************************** //
@@ -91,6 +49,39 @@ void scene_structure::initialize() {
     christ.transform.scaling = 0.01;
     christ.transform.translation = {0, -40, 3.0f};
     christ.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
+}
+
+
+void scene_structure::update_camera() {
+    // setting variables
+    custom_inputs_keyboard_parameters const &keyboard = inputs.keyboard;
+    camera_spherical_coordinates &camera = environment.camera;
+
+    // defining the angles the camera will rotate given the mouse pointer coordinates
+    vec2 mouse_position = inputs.mouse.position.current;
+
+    float theta = mouse_position.y / camera_rotation_damping;
+    float phi = mouse_position.x / camera_rotation_damping;
+    if (!inputs.mouse.on_gui && (pow(mouse_position.y, 2) + pow(mouse_position.x, 2)) > 0.10) {
+        camera.manipulator_rotate_spherical_coordinates(phi, -theta);
+    }
+
+
+    if (keyboard.up || keyboard.w_key) {
+        if (keyboard.shift)
+            camera.center_of_rotation += camera_speed * vec3{0, 0, 1};
+        else camera.center_of_rotation += camera_speed * camera.front();
+    }
+    if (keyboard.down || keyboard.s_key) {
+        if (keyboard.shift)
+            camera.center_of_rotation -= camera_speed * vec3{0, 0, 1};
+        else camera.center_of_rotation -= camera_speed * camera.front();
+    }
+    if (keyboard.left || keyboard.a_key)
+        camera.center_of_rotation -= camera_speed * camera.right();
+    if (keyboard.right || keyboard.d_key)
+        camera.center_of_rotation += camera_speed * camera.right();
+
 }
 
 
@@ -160,6 +151,10 @@ void scene_structure::display_gui() {
     ImGui::Checkbox("Wireframe", &gui.display_wireframe);
     ImGui::SliderFloat("Camera Speed", &camera_speed, 1.0f, 10.0f);
     ImGui::SliderFloat("Camera Rotation Damping", &camera_rotation_damping, 1.0f, 50.0f);
+    bool pressed = ImGui::Button("Reset Camera");
+    if (pressed)
+        reset_camera();
+
     ImGui::Checkbox("Compute lighting", &gui.compute_lighting);
 
     ImGui::Checkbox("Display terrain", &gui.display_terrain);
@@ -208,6 +203,11 @@ void scene_structure::display_gui() {
 
     }
 
+}
+
+void scene_structure::reset_camera() {
+    environment.camera.axis = camera_spherical_coordinates_axis::z;
+    environment.camera.look_at({120.0f, -20.0f, 20.0f}, {0, -40, 0.0f});
 }
 
 
