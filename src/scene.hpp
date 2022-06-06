@@ -11,13 +11,13 @@
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
     bool display_frame = true;
-    bool display_wireframe = true;
+    bool display_wireframe = false;
     bool mouse_direction = false;
     bool display_terrain = true;
     bool display_boids = false;
     bool display_cube = false;
     bool compute_lighting = true;
-    bool display_water = true;
+    bool display_water = false;
     bool display_cone = false;
     bool reflect = true;
     bool terrain_modeling_mode = false;

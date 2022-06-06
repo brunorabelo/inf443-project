@@ -43,13 +43,12 @@ void scene_structure::initialize() {
     //initalize vector
     boids.setup();
 
-    christ.initialize(mesh_load_file_obj("assets/christ.obj"));
+    // Christ the Redeemer statue
+    christ.initialize(mesh_load_file_obj("assets/christ.obj"), "christ", reflectable_shader);
     christ.texture = opengl_load_texture_image("assets/marmore1.jpg");
-
-
-//    wing_left.shading.color = {1.0f, 0, 0};
-    christ.transform.scaling = 0.005;
-    christ.transform.translation = {0, -40, 3.0f};
+    christ.shading.phong = { 0.3f, 0.6f, 0, 64.0f };
+    christ.transform.scaling = 0.01f;
+    christ.transform.translation = {0, -40, 30.0f};
     christ.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
 
 }
@@ -137,7 +136,9 @@ void scene_structure::display(float dt, float total_time) {
     boids.animate(dt, total_time);
     if (gui.display_boids) boids.display(environment, gui.display_wireframe, gui.display_cube);
 
-    draw(christ, environment);
+    draw_reflectable(christ, environment, false, gui.compute_lighting);
+    if (gui.reflect)
+        draw_reflectable(christ, environment, true, gui.compute_lighting);
 
 
 }
@@ -172,11 +173,13 @@ void scene_structure::display_gui() {
         update |= ImGui::SliderFloat("Persistance", &tparams.persistency, 0.1f, 0.6f);
         update |= ImGui::SliderFloat("Frequency gain", &tparams.frequency_gain, 1.5f, 2.5f);
         update |= ImGui::SliderInt("Octave", &tparams.octave, 1, 8);
-        update |= ImGui::SliderFloat("Height", &tparams.terrain_height, 10.0f, 50.0f);
+        update |= ImGui::SliderFloat("Height", &tparams.terrain_height, 30.0f, 70.0f);
         update |= ImGui::SliderFloat("Scale", &tparams.scale, 0.1f, 2.0f);
         update |= ImGui::SliderFloat("Perlin offset X", &tparams.perlin_offsetx, -2.0f, 2.0f);
         update |= ImGui::SliderFloat("Perlin offset Y", &tparams.perlin_offsety, -2.0f, 2.0f);
         update |= ImGui::SliderFloat("Offset Z", &tparams.offsetz, -50.0f, 10.0f);
+        update |= ImGui::SliderFloat("Cutoff length", &tparams.cutoff_len, 0.01f, 1);
+        update |= ImGui::SliderInt("Cutoff exponent", &tparams.cutoff_n, 2, 10);
 
         if (update)// if any slider has been changed - then update the terrain
             update_terrain(terrain, terrain_visual, tparams);

@@ -30,8 +30,10 @@ void update_terrain(mesh &terrain, mesh_drawable &terrain_visual, terrain_parame
             float const noise = noise_perlin({u / tparams.scale + tparams.perlin_offsetx,
                                               v / tparams.scale + tparams.perlin_offsety},
                                              tparams.octave, tparams.persistency, tparams.frequency_gain);
-            float z = tparams.terrain_height * noise + tparams.offsetz;
-            float board_limit = 10;
+            float z = tparams.terrain_height * noise;
+            z *= exp(-(pow(u-0.5f, tparams.cutoff_n) + pow(v-0.5f, tparams.cutoff_n)) / tparams.cutoff_len);
+            terrain.position[idx].z = z + tparams.offsetz;
+            /*float board_limit = 10;
             bool on_board = false;
             float f = 1.0f;
             if (ku > N - board_limit) {
@@ -48,11 +50,11 @@ void update_terrain(mesh &terrain, mesh_drawable &terrain_visual, terrain_parame
                 on_board = true;
             }
             if (on_board)
-                f /= board_limit;
+                f /= board_limit;*/
             // use the noise as height value
-            terrain.position[idx].z = z * f;
-            // use also the noise as color value
-            terrain.color[idx] = 0.3f * vec3(0, 0.5f, 0) + 0.7f * noise * vec3(1, 1, 1);
+//            terrain.position[idx].z = z * f;
+            //// use also the noise as color value
+            //terrain.color[idx] = 0.3f * vec3(0, 0.5f, 0) + 0.7f * noise * vec3(1, 1, 1);
         }
     }
 

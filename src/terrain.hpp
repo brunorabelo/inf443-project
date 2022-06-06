@@ -16,10 +16,14 @@ struct terrain_parameters
 	float scale = 0.7f;
 	float perlin_offsetx = 0.082f;
 	float perlin_offsety = -0.557f;
-	float persistency = 0.412f;
+	float persistency = 0.432f;
 	float frequency_gain = 2.304f;
 	int octave = 8;
-	float terrain_height = 25.052f;
+	float terrain_height = 53.093f;
+
+	// Cutoff function parameters
+	float cutoff_len = 0.036f;
+	int cutoff_n = 4;
 
 	// Transformation parameters
 	float offsetz = -17.885f;

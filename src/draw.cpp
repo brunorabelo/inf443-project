@@ -53,23 +53,15 @@ void draw_reflectable(hierarchy_mesh_drawable const& hierarchy,
 	}
 }
 
-// Deactivates z-buffer to draw semitransparent water
+// Draws semitransparent layer of water
 void draw_water(mesh_drawable const& water_visual, environment_camera const& environment)
 {
-	// Enable use of alpha component as color blending for transparent elements
-	//  alpha = current_color.alpha
-	//  new color = previous_color * alpha + current_color * (1-alpha)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// Disable depth buffer writing
-	//  - Transparent elements cannot use depth buffer
-	//  - They are supposed to be display from furest to nearest elements
 	glDepthMask(false);
 
 	draw(water_visual, environment);
 
-	// Don't forget to re-activate the depth-buffer write
 	glDepthMask(true);
 	glDisable(GL_BLEND);
 }

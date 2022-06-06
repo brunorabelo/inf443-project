@@ -48,14 +48,19 @@ void main()
 	vec3 last_col = vec3(view*vec4(0.0, 0.0, 0.0, 1.0)); // get the last column
 	vec3 camera_position = -O*last_col;
 
-	// If camera above water, clip object and its reflection to water level
-	if(camera_position.z > 0) { 
-		if(reflection && fragment.position.z > 0)
-			discard;
- 		if(!reflection && fragment.position.z < 0)
- 			discard;
-	} else if(reflection) // Below water, don't show reflections
+//	// If camera above water, clip object and its reflection to water level
+//	if(camera_position.z > 0) { 
+//		if(reflection && fragment.position.z > 0)
+//			discard;
+// 		if(!reflection && fragment.position.z < 0)
+// 			discard;
+//	} else if(reflection) // Below water, don't show reflections
+//		discard;
+	if(reflection && fragment.position.z > 0)
 		discard;
+ 	if(!reflection && fragment.position.z < 0)
+ 		discard;
+
 		
 	
 	// Texture
