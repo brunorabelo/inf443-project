@@ -43,12 +43,20 @@ uniform bool compute_lighting = true; // Whether to do expensive lighting comput
 
 void main()
 {
+	// Compute the position of the center of the camera
+	mat3 O = transpose(mat3(view));                   // get the orientation matrix
+	vec3 last_col = vec3(view*vec4(0.0, 0.0, 0.0, 1.0)); // get the last column
+	vec3 camera_position = -O*last_col;
 
-	// Clip reflections to water level
-	if(reflection && fragment.position.z > 0)
+	// If camera above water, clip object and its reflection to water level
+	if(camera_position.z > 0) { 
+		if(reflection && fragment.position.z > 0)
+			discard;
+ 		if(!reflection && fragment.position.z < 0)
+ 			discard;
+	} else if(reflection) // Below water, don't show reflections
 		discard;
- 	if(!reflection && fragment.position.z < 0)
- 		discard;
+		
 	
 	// Texture
 	// ************************* //
@@ -63,12 +71,9 @@ void main()
 	// Compute the base color of the object based on: vertex color, uniform color, and texture
 	vec3 color_object  = fragment.color * color * color_image_texture.rgb;
 
-		if(compute_lighting) {
+	
 
-		// Compute the position of the center of the camera
-		mat3 O = transpose(mat3(view));                   // get the orientation matrix
-		vec3 last_col = vec3(view*vec4(0.0, 0.0, 0.0, 1.0)); // get the last column
-		vec3 camera_position = -O*last_col;
+	if(compute_lighting) {
 
 		// Re-normalize the normals (interpolated on the triangle)
 		vec3 N = normalize(fragment.normal);
@@ -95,9 +100,6 @@ void main()
 			vec3 V = normalize(camera_position-fragment.position);
 			specular = pow( max(dot(R,V),0.0), specular_exp );
 		}
-
-
-
 
 		// Compute Shading
 		// ************************* //

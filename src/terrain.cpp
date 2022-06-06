@@ -4,17 +4,16 @@
 
 using namespace cgp;
 
-mesh create_terrain_mesh(int N, float len)
-{
-    mesh terrain = mesh_primitive_grid({ -len,-len,0 }, { len,-len,0 }, { len,len,0 }, { -len,len,0 }, N, N);
+mesh create_terrain_mesh(int N, float len) {
+    mesh terrain = mesh_primitive_grid({-len, -len, 0}, {len, -len, 0}, {len, len, 0}, {-len, len, 0}, N, N);
     return terrain;
 }
 
-mesh create_terrain_mesh(terrain_parameters const& tparams) {
+mesh create_terrain_mesh(terrain_parameters const &tparams) {
     return create_terrain_mesh(tparams.mesh_sampling, tparams.length);
 }
 
-void update_terrain(mesh& terrain, mesh_drawable& terrain_visual, terrain_parameters const& tparams) {
+void update_terrain(mesh &terrain, mesh_drawable &terrain_visual, terrain_parameters const &tparams) {
     int const N = tparams.mesh_sampling;
 
     // Recompute the new vertices
@@ -28,13 +27,30 @@ void update_terrain(mesh& terrain, mesh_drawable& terrain_visual, terrain_parame
             int const idx = ku * N + kv;
 
             // Compute the Perlin noise
-            float const noise = noise_perlin({ u/tparams.scale + tparams.perlin_offsetx,
-                v/tparams.scale + tparams.perlin_offsety},
-                tparams.octave, tparams.persistency, tparams.frequency_gain);
-
+            float const noise = noise_perlin({u / tparams.scale + tparams.perlin_offsetx,
+                                              v / tparams.scale + tparams.perlin_offsety},
+                                             tparams.octave, tparams.persistency, tparams.frequency_gain);
+            float z = tparams.terrain_height * noise + tparams.offsetz;
+            float board_limit = 10;
+            bool on_board = false;
+            float f = 1.0f;
+            if (ku > N - board_limit) {
+                f = N - ku;
+                on_board = true;
+            } else if (kv > N - board_limit) {
+                f = N - kv;
+                on_board = true;
+            } else if (ku < board_limit) {
+                f = ku;
+                on_board = true;
+            } else if (kv < board_limit) {
+                f = kv;
+                on_board = true;
+            }
+            if (on_board)
+                f /= board_limit;
             // use the noise as height value
-            terrain.position[idx].z = tparams.terrain_height * noise + tparams.offsetz;
-
+            terrain.position[idx].z = z * f;
             // use also the noise as color value
             terrain.color[idx] = 0.3f * vec3(0, 0.5f, 0) + 0.7f * noise * vec3(1, 1, 1);
         }

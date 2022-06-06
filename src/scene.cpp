@@ -8,7 +8,8 @@ void scene_structure::initialize() {
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
     environment.camera.axis = camera_spherical_coordinates_axis::z;
-    environment.camera.look_at({60.0f, 0.0f, 0.0f}, {0, 0, 0.0f});
+    environment.camera.look_at({200.0f, 200.0f, 120.0f}, {0, -40, 0.0f});
+
 
     // Import shaders & textures
     reflectable_shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
@@ -20,6 +21,7 @@ void scene_structure::initialize() {
     // Environment settings
     environment.background_color = {0.529, 0.808, 0.922};
     environment.light = {100, 0, 10};
+
 
     // Initialize terrain
     terrain = create_terrain_mesh(tparams);
@@ -36,15 +38,66 @@ void scene_structure::initialize() {
     cone = mesh_primitive_cone(20.0f, 40.0f, vec3(0.0f, 0.0f, 35.0f), vec3(0, 0, -1));
     cone_visual.initialize(cone, "cone", reflectable_shader);
 
-    //initalize boids_vector
+    //initalize vector
     boids.setup();
 
-    bird.setup();
+    christ.initialize(mesh_load_file_obj("assets/christ.obj"));
+    christ.texture = opengl_load_texture_image("assets/marmore1.jpg");
+
+
+//    wing_left.shading.color = {1.0f, 0, 0};
+    christ.transform.scaling = 0.005;
+    christ.transform.translation = {0, -40, 3.0f};
+    christ.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
+
 }
 
 
-void scene_structure::display() {
+void scene_structure::update_camera() {
+    // setting variables
+    custom_inputs_keyboard_parameters const &keyboard = inputs.keyboard;
+    camera_spherical_coordinates &camera = environment.camera;
 
+    // defining the angles the camera will rotate given the mouse pointer coordinates
+    vec2 mouse_position = inputs.mouse.position.current;
+
+    float theta = mouse_position.y / camera_rotation_damping;
+    float phi = mouse_position.x / camera_rotation_damping;
+    if (gui.mouse_direction && !inputs.mouse.on_gui && (pow(mouse_position.y, 2) + pow(mouse_position.x, 2)) > 0.10) {
+        camera.manipulator_rotate_spherical_coordinates(phi, -theta);
+    }
+
+
+    if (keyboard.up || keyboard.w_key) {
+        if (keyboard.shift)
+            camera.center_of_rotation += camera_speed * vec3{0, 0, 1};
+        else if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(0, camera_speed / camera_rotation_damping);
+        else camera.center_of_rotation += camera_speed * camera.front();
+    }
+    if (keyboard.down || keyboard.s_key) {
+        if (keyboard.shift)
+            camera.center_of_rotation -= camera_speed * vec3{0, 0, 1};
+        else if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(0, -camera_speed / camera_rotation_damping);
+        else camera.center_of_rotation -= camera_speed * camera.front();
+    }
+    if (keyboard.left || keyboard.a_key) {
+        if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(camera_speed / camera_rotation_damping, 0);
+        else
+            camera.center_of_rotation -= camera_speed * camera.right();
+    }
+    if (keyboard.right || keyboard.d_key) {
+        if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(-camera_speed / camera_rotation_damping, 0);
+        else
+            camera.center_of_rotation += camera_speed * camera.right();
+    }
+
+}
+
+void scene_structure::display(float dt, float total_time) {
     // Basic elements of the scene
     environment.light = environment.camera.position();
     if (gui.display_frame)
@@ -52,92 +105,46 @@ void scene_structure::display() {
 
 
     if (gui.display_cone) {
-        draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
+        draw_reflectable(cone_visual, environment, false, gui.compute_lighting);
 
         if (gui.reflect)
-            draw_reflectable(cone_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
+            draw_reflectable(cone_visual, environment, true, gui.compute_lighting);
     }
 
-
+    // display water
     if (gui.display_water)
         draw_water(water_visual, environment);
 
+    // display terrain
     if (gui.display_terrain) {
         if (gui.reflect)
-            draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, true, gui.compute_lighting);
+            draw_reflectable(terrain_visual, environment, true, gui.compute_lighting);
 
-        draw_reflectable(terrain_visual, environment, GL_FRAMEBUFFER, false, gui.compute_lighting);
+        draw_reflectable(terrain_visual, environment, false, gui.compute_lighting);
 
         if (gui.display_wireframe)
             draw_wireframe(terrain_visual, environment);
     }
 
-    if (gui.display_boids) display_boids();
 
-    if (gui.display_bird)
-        bird.display(environment);
-    if (gui.display_wireframe)
-        bird.display_wireframe(environment);
+    // display boids
+    boids.animate(dt, total_time);
+    if (gui.display_boids) boids.display(environment, gui.display_wireframe, gui.display_cube);
+
+    draw(christ, environment);
+
+
 }
-
-void scene_structure::display_billboard() {
-    // Find the rotation such that:
-    //  the right-direction of the billboard is turned to match the right-direction of the camera => R*{1,0,0} = camera_right
-    //  but the billboard remains oriented upward in the z direction => R*{0,0,1} = {0,0,1}
-    vec3 camera_right = environment.camera.right();
-    rotation_transform R = rotation_transform::between_vector({1, 0, 0}, {0, 0, 1}, camera_right, {0, 0, 1});
-    billboard.transform.rotation = R;
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(false);
-
-    vec3 const offset = {0, 0, 0.02f};
-    for (vec3 position: billboard_position) {
-        billboard.transform.translation = position - offset;
-        draw(billboard, environment);
-    }
-
-    glDepthMask(true);
-    glDisable(GL_BLEND);
-
-
-    if (gui.display_wireframe) {
-        for (vec3 position: billboard_position) {
-            billboard.transform.translation = position - offset;
-            draw_wireframe(billboard, environment);
-        }
-    }
-}
-
-
-void scene_structure::animate() {
-
-    // Update the current time
-    float dt = timer.update();
-    boids.animate(dt, timer.t);
-}
-
-void scene_structure::display_boids() {
-    boids.update();
-
-    for (Boid &boid: boids.boids_vector) {
-        boid.update();
-        draw(boid.bird.hierarchy, environment);
-
-        if (gui.display_wireframe) {
-            draw_wireframe(boid.bird.hierarchy, environment);
-        }
-    }
-    if (gui.display_cube) {
-        draw_wireframe(boids.cube_mesh_drawable, environment);
-    }
-}
-
 
 void scene_structure::display_gui() {
     ImGui::Checkbox("Frame", &gui.display_frame);
     ImGui::Checkbox("Wireframe", &gui.display_wireframe);
+    ImGui::SliderFloat("Camera Speed", &camera_speed, 1.0f, 10.0f);
+    ImGui::SliderFloat("Camera Rotation Damping", &camera_rotation_damping, 1.0f, 50.0f);
+    ImGui::Checkbox("Mouse camera direction", &gui.mouse_direction);
+    bool pressed = ImGui::Button("Reset Camera");
+    if (pressed)
+        reset_camera();
 
     ImGui::Checkbox("Compute lighting", &gui.compute_lighting);
 
@@ -147,11 +154,11 @@ void scene_structure::display_gui() {
 
     ImGui::Checkbox("Reflect", &gui.reflect);
 
-    if(gui.display_terrain)
+    if (gui.display_terrain)
         ImGui::Checkbox("Terrain modeling mode", &gui.terrain_modeling_mode);
 
     ImGui::SliderFloat("Position Z", &terrain_visual.transform.translation.z, -30.0f, 30.0f);
-    if(gui.display_cone)
+    if (gui.display_cone)
         ImGui::SliderFloat("Cone translation", &cone_visual.transform.translation.z, -30.0f, 60.0f);
 
     if (gui.display_terrain && gui.terrain_modeling_mode) {
@@ -173,19 +180,28 @@ void scene_structure::display_gui() {
 
     if (gui.display_boids)
         ImGui::Checkbox("Boids modeling mode", &gui.boids_modeling_mode);
-    if (gui.display_boids && gui.boids_modeling_mode){
+    if (gui.display_boids && gui.boids_modeling_mode) {
 
-        ImGui::Checkbox("cube", &gui.display_cube);
-        ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
-        ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
-        ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
-        ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
-        ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
-        ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
-        ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
-        ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
+    ImGui::Checkbox("boids_vector", &gui.display_boids);
+    ImGui::Checkbox("cube", &gui.display_cube);
+    ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
+    ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
+    ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
+    ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
+    ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
+    ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
+    ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
+    ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
 
     }
+
+}
+
+void scene_structure::reset_camera() {
+    // reset the camer to the initial state
+    environment.camera.axis = camera_spherical_coordinates_axis::z;
+    environment.camera.look_at({120.0f, -20.0f, 20.0f}, {0, -40, 0.0f});
+}
 
 }
 

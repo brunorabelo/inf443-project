@@ -1,26 +1,24 @@
 #pragma once
 
 #include "cgp/cgp.hpp"
-#include "boids.hpp"
-#include "bird.hpp"
+#include "environment_camera/environment_camera.hpp"
+#include "boids_engine/boids.hpp"
 #include "water.hpp"
 #include "terrain.hpp"
 #include "draw.hpp"
+#include "inputs/inputs.hpp"
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
     bool display_frame = true;
-    bool display_wireframe = false;
-    bool display_terrain = false;
-    bool display_tree = false;
-    bool display_mushroom = false;
-    bool display_billboard = false;
-    bool display_boids = true;
-    bool display_cube = true;
-    bool display_bird = true;
+    bool display_wireframe = true;
+    bool mouse_direction = false;
+    bool display_terrain = true;
+    bool display_boids = false;
+    bool display_cube = false;
     bool compute_lighting = true;
     bool display_water = true;
-    bool display_cone = true;
+    bool display_cone = false;
     bool reflect = true;
     bool terrain_modeling_mode = false;
     bool boids_modeling_mode = false;
@@ -35,8 +33,8 @@ struct scene_structure {
     // ****************************** //
 
     cgp::mesh_drawable global_frame;          // The standard global frame
-    cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
-    cgp::inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension_size)
+    environment_camera environment; // Standard environment controler
+    custom_inputs_interaction_parameters inputs; // Storage for inputs status (mouse, keyboard, window dimension_size)
 
     gui_parameters gui;                       // Standard GUI element storage
 
@@ -66,33 +64,27 @@ struct scene_structure {
 
     Boids boids;
 
-    Bird bird;
-
+    mesh_drawable christ;
 
     // Timer used for the interpolation of the position
     cgp::timer_event_periodic timer;
 
-
-    void display_trees();
-
-    void display_mushroom();
-
-    void display_billboard();
-
-    void display_boids();
-
+    float camera_speed = 2.0f; // camera speed
+    float camera_rotation_damping = 50.0f;
 
     // ****************************** //
     // Functions
     // ****************************** //
 
     void initialize();  // Standard initialization to be called before the animation loop
-    void animate();
 
-    void display();     // The frame display to be called within the animation loop
+    void update_camera(); //to update the camera position and orientation in response to user input
+
+    void display(float dt, float total_time);     // The frame display to be called within the animation loop
     void display_gui(); // The display of the GUI, also called within the animation loop
 
 
+    void reset_camera();
 };
 
 

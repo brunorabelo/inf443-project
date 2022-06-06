@@ -36,7 +36,7 @@ void main()
 	vec4 p = model * vec4(position, 1.0);
 
 	if(reflection)
-		p.z = -p.z / 1.333f;
+		p.z = -p.z;
 
 	// The normal of the vertex in the world space
 	vec4 n = model * vec4(normal, 0.0);

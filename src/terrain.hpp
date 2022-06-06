@@ -9,8 +9,8 @@
 struct terrain_parameters
 {
 	// Mesh building parameters, these cannot be changed
-	int mesh_sampling = 280;
-	float length = 100.0f;
+	int mesh_sampling = 140;
+	float length = 200.0f;
 
 	// Perlin noise parameters
 	float scale = 0.7f;

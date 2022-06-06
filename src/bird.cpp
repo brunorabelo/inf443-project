@@ -3,41 +3,50 @@
 //
 
 #include "bird.hpp"
+#include "draw.hpp"
+#include "environment_camera/environment_camera.hpp"
 
 using namespace cgp;
 
 
 void Bird::setup() {
+    GLuint shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
+
     float scale = 1;
     mesh m;
     m.push_back(mesh_primitive_arrow());
-    m.push_back(mesh_primitive_ellipsoid({1, 1, 1.5}));
-    body.initialize(m, "body");
-    body.shading.color = {0, 0, 0};
+    m.push_back(mesh_primitive_ellipsoid({0.8, 0.8, 2}));
+    auto bird_texture = opengl_load_texture_image("assets/bird.jpg");
+    body.initialize(m, "body", shader);
+    body.texture = opengl_load_texture_image("assets/bird2.jpg");
+//    body.shading.color = {0, 0, 0};
     body.transform.scaling = scale;
 
-    head.initialize(mesh_primitive_sphere(0.9f), "head");
-    head.shading.color = {0.0f, 0, 0};
+    head.initialize(mesh_primitive_sphere(0.9f), "head", shader);
+    head.texture = bird_texture;
     head.transform.scaling = scale;
 
-    wing_left.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_left");
+    wing_left.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_left", shader);
+    wing_left.texture = bird_texture;
 //    wing_left.transform.translation = {0,0,1};
-    wing_left.shading.color = {1.0f, 0, 0};
     wing_left.transform.scaling = scale;
 
-    wing_right.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_right");
+    wing_right.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_right", shader);
     wing_right.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
+    wing_right.texture = bird_texture;
 //    wing_right.transform.translation = {-1,-1,1};
-    wing_right.shading.color = {1, 1, 0};
     wing_right.transform.scaling = scale;
 
-    eye_left.initialize(mesh_primitive_sphere(0.2f), "eye_left");
-    eye_left.shading.color = {0.2f, 0.2f, 0.2f};
+    eye_left.initialize(mesh_primitive_sphere(0.2f), "eye_left", shader);
+    eye_left.shading.color = {1.0f, 1.0f, 1.0f};
     eye_left.transform.scaling = scale;
 
-    eye_right.initialize(mesh_primitive_sphere(0.2f), "eye_right");
-    eye_right.shading.color = {0.2f, 0.2f, 0.2f};
+    eye_right.initialize(mesh_primitive_sphere(0.2f), "eye_right", shader);
+    eye_right.shading.color = {1.0f, 1.0f, 1.0f};
     eye_right.transform.scaling = scale;
+
+//    tail.initialize(mesh_primitive_cylinder())
+
 
 
     // Generat the hierarchy
@@ -51,16 +60,19 @@ void Bird::setup() {
 }
 
 
-void Bird::display(cgp::scene_environment_basic_camera_spherical_coords environment) {
-    draw(hierarchy, environment);
+void Bird::display(environment_camera environment, bool wireframe) {
+    draw_reflectable(hierarchy, environment, false);
+    draw_reflectable(hierarchy, environment, true);
+
+    if (wireframe)
+        draw_wireframe(hierarchy, environment);
 }
 
-void Bird::display_wireframe(cgp::scene_environment_basic_camera_spherical_coords coords) {
+void Bird::display_wireframe(environment_camera coords) {
     draw_wireframe(hierarchy, coords);
 }
 
 void Bird::animate(float t, float speed_z) {
-
     float phase = 0;
     if (speed_z < 0)
         return;
