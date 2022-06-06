@@ -64,7 +64,8 @@ struct scene_structure {
     std::vector<cgp::vec3> mushroom_position;
     std::vector<cgp::vec3> billboard_position;
 
-    Boids boids;
+    Boids boids1;
+    Boids boids2;
 
     mesh_drawable christ;
 

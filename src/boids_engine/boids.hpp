@@ -38,10 +38,10 @@ private:
 public:
 
     float dimension_size = 80.0f;
-    float damping_factor_rule1 = 71.0f;
+    float damping_factor_rule1 = 60.0f;
     float damping_factor_rule2 = 10.0f;
-    float damping_factor_rule3 = 40.0f;
-    float minimal_distance = 7.0f;
+    float damping_factor_rule3 = 54.0f;
+    float minimal_distance = 3.2f;
     float damping_speed = 0.245f;
     float max_speed = 15.0f;
     float perch_timer = 10.0f;

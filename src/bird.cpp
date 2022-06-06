@@ -57,6 +57,8 @@ void Bird::setup() {
     hierarchy.add(wing_left, "body", {0, 0.2f, 0.8f});
     hierarchy.add(wing_right, "body", {0, 0.2f, 0.8f});
 
+    hierarchy["body"].transform.scaling = 0.2f;
+    hierarchy.update_local_to_global_coordinates();
 }
 
 
@@ -76,7 +78,7 @@ void Bird::animate(float t, float speed_z) {
     float phase = 0;
     if (speed_z < 0)
         return;
-    float period = speed_z / 8.0;
+    float period = speed_z / 10.0;
     hierarchy["wing_left"].transform.rotation = rotation_transform::from_axis_angle({0, 0, 1},
                                                                                     Pi / 8.0f *
                                                                                     (1 + std::cos(period * t + phase)));

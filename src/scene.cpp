@@ -41,12 +41,15 @@ void scene_structure::initialize() {
     cone_visual.initialize(cone, "cone", reflectable_shader);
 
     //initalize vector
-    boids.setup();
+    boids1 = Boids(100, vec3{0, 50, 70});
+    boids2 = Boids(60, vec3{0, -70, 60});
 
+    boids1.setup();
+    boids2.setup();
     // Christ the Redeemer statue
     christ.initialize(mesh_load_file_obj("assets/christ.obj"), "christ", reflectable_shader);
     christ.texture = opengl_load_texture_image("assets/marmore1.jpg");
-    christ.shading.phong = { 0.3f, 0.6f, 0, 64.0f };
+    christ.shading.phong = {0.3f, 0.6f, 0, 64.0f};
     christ.transform.scaling = 0.01f;
     christ.transform.translation = {0, -40, 30.0f};
     christ.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
@@ -133,8 +136,12 @@ void scene_structure::display(float dt, float total_time) {
 
 
     // display boids
-    boids.animate(dt, total_time);
-    if (gui.display_boids) boids.display(environment, gui.display_wireframe, gui.display_cube);
+    boids1.animate(dt, total_time);
+    boids2.animate(dt, total_time);
+    if (gui.display_boids) {
+        boids1.display(environment, gui.display_wireframe, gui.display_cube);
+        boids2.display(environment, gui.display_wireframe, gui.display_cube);
+    }
 
     draw_reflectable(christ, environment, false, gui.compute_lighting);
     if (gui.reflect)
@@ -193,14 +200,14 @@ void scene_structure::display_gui() {
 
         ImGui::Checkbox("boids_vector", &gui.display_boids);
         ImGui::Checkbox("cube", &gui.display_cube);
-        ImGui::SliderFloat("cube_dimension", &boids.dimension_size, 10, 100);
-        ImGui::SliderFloat("damping_factor_rule_1", &boids.damping_factor_rule1, 1, 100);
-        ImGui::SliderFloat("damping_factor_rule_2", &boids.damping_factor_rule2, 1, 100);
-        ImGui::SliderFloat("damping_factor_rule_3", &boids.damping_factor_rule3, 1, 100);
-        ImGui::SliderFloat("damping_speed", &boids.damping_speed, 0.1, 1.5);
-        ImGui::SliderFloat("minimal_distance", &boids.minimal_distance, 0.5, 10);
-        ImGui::SliderFloat("maximal_speed", &boids.max_speed, 5, 20);
-        ImGui::SliderFloat("perch_timer", &boids.perch_timer, 1, 20);
+        ImGui::SliderFloat("cube_dimension", &boids1.dimension_size, 10, 100);
+        ImGui::SliderFloat("damping_factor_rule_1", &boids1.damping_factor_rule1, 1, 100);
+        ImGui::SliderFloat("damping_factor_rule_2", &boids1.damping_factor_rule2, 1, 100);
+        ImGui::SliderFloat("damping_factor_rule_3", &boids1.damping_factor_rule3, 1, 100);
+        ImGui::SliderFloat("damping_speed", &boids1.damping_speed, 0.1, 1.5);
+        ImGui::SliderFloat("minimal_distance", &boids1.minimal_distance, 0.5, 10);
+        ImGui::SliderFloat("maximal_speed", &boids1.max_speed, 5, 20);
+        ImGui::SliderFloat("perch_timer", &boids1.perch_timer, 1, 20);
 
     }
 
