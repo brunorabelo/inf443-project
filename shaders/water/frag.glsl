@@ -1,6 +1,11 @@
 #version 330 core  // OpenGL 3.3 shader
 
-// Fragment shader - this code is executed for every pixel/fragment that belongs to a displayed shape
+// Fragment shader for the water.
+// This calculates the color of the water if alpha_only is false,
+// and calculates a mask (stored as alpha values) to write reflections with
+// if alpha_only is true.
+
+#define PI 3.1415926538
 
 // Inputs coming from tehe vertex shader
 in struct fragment_data
@@ -32,6 +37,8 @@ uniform float specular_exp; // Specular exponent
 
 uniform mat4 view;       // View matrix (rigid transform) of the camera - to compute the camera position
 
+uniform bool alpha_only;
+
 void main()
 {
 
@@ -52,42 +59,48 @@ void main()
 	// Phong coefficient (diffuse, specular)
 	// ************************* //
 
-	// Unit direction toward the light
+	// Unit direction toward the light and toward the camera
 	vec3 L = normalize(light-fragment.position);
+	vec3 V = normalize(camera_position-fragment.position);
 
-	// Diffuse coefficient
-	float diffuse = max(dot(N,L),0.0);
-
-	// Specular coefficient
-	float specular = 0.0;
-	if(diffuse>0.0){
-		vec3 R = reflect(-L,N); // symetric of light-direction with respect to the normal
-		vec3 V = normalize(camera_position-fragment.position);
-		specular = pow( max(dot(R,V),0.0), specular_exp );
+	if(alpha_only) {
+		// Compute approximated Fresnel reflection coefficient
+		float angle = acos(dot(N, V));
+		float fresnel = exp(6 * angle / PI) / exp(3);
+		FragColor = vec4(0,0,0,fresnel);
 	}
+	else {
+		// Diffuse coefficient
+		float diffuse = max(dot(N,L),0.0);
 
-	// Texture
-	// ************************* //
+		// Specular coefficient
+		float specular = 0.0;
+		if(diffuse>0.0){
+			vec3 R = reflect(-L,N); // symetric of light-direction with respect to the normal
+			specular = pow( max(dot(R,V),0.0), specular_exp );
+		}
+
+		// Texture
+		// ************************* //
 	
-	// Current uv coordinates
-	// by default inverse the v direction (avoids common image upside-down)
-	vec2 uv_image = vec2(fragment.uv.x, 1.0-fragment.uv.y);
+		// Current uv coordinates
+		// by default inverse the v direction (avoids common image upside-down)
+		vec2 uv_image = vec2(fragment.uv.x, 1.0-fragment.uv.y);
 
-	// Get the current texture color
-	vec4 color_image_texture = texture(image_texture, uv_image);
+		// Get the current texture color
+		vec4 color_image_texture = texture(image_texture, uv_image);
 
 
-	// Compute Shading
-	// ************************* //
+		// Compute Shading
+		// ************************* //
 
-	// Compute the base color of the object based on: vertex color, uniform color, and texture
-	vec3 color_object  = fragment.color * color * color_image_texture.rgb;
+		// Compute the base color of the object based on: vertex color, uniform color, and texture
+		vec3 color_object  = fragment.color * color * color_image_texture.rgb;
 
-	// Compute the final shaded color using Phong model
-	vec3 color_shading = (Ka + Kd * diffuse) * color_object + Ks * specular * vec3(1.0, 1.0, 1.0);
+		// Compute the final shaded color using Phong model
+		vec3 color_shading = (Ka + Kd * diffuse) * color_object + Ks * specular * vec3(1.0, 1.0, 1.0);
 	
-	// Output color, with the alpha component
-	FragColor = vec4(color_shading, alpha * color_image_texture.a);
-
-
+		// Output color, with the alpha component
+		FragColor = vec4(color_shading, alpha);
+	}
 }

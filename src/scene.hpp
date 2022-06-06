@@ -11,9 +11,9 @@
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
-    bool display_frame = true;
+    bool display_frame = false;
     bool display_wireframe = false;
-    bool display_terrain = true;
+    bool display_terrain = false;
     bool display_tree = false;
     bool display_mushroom = false;
     bool display_billboard = false;
@@ -26,6 +26,7 @@ struct gui_parameters {
     bool reflect = true;
     bool terrain_modeling_mode = false;
     bool boids_modeling_mode = false;
+    bool display_christ = true;
 };
 
 

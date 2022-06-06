@@ -20,11 +20,21 @@ void draw_reflectable(mesh_drawable const& drawable,
 	// Send custom uniforms to it
 	// compute_lighting => if false, will display texture color instead, no shading calculations done
 	// reflection => if false, draw real object; if true, draw its reflection
-	opengl_uniform(drawable.shader, "compute_lighting", compute_lighting);
-	opengl_uniform(drawable.shader, "reflection", reflection);
+	opengl_uniform(drawable.shader, "compute_lighting", compute_lighting, false);
+	opengl_uniform(drawable.shader, "reflection", reflection, false);
 
-	// Rest of the work
-	draw(drawable, environment);
+	// Blend reflections into image, supposing alpha mask already drawn by draw_water_mask()
+	if (reflection) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_DST_ALPHA, GL_DST_ALPHA);
+		//glDepthMask(true);
+
+		draw(drawable, environment);
+
+		glDisable(GL_BLEND);
+	}
+	else
+		draw(drawable, environment);
 }
 
 void draw_reflectable(hierarchy_mesh_drawable_node const& node,
@@ -53,23 +63,34 @@ void draw_reflectable(hierarchy_mesh_drawable const& hierarchy,
 	}
 }
 
-// Deactivates z-buffer to draw semitransparent water
-void draw_water(mesh_drawable const& water_visual, environment_camera const& environment)
+// Draws "mask" on buffer alpha values based on water Fresnel coefficients
+// to tell where reflections should be visible
+void draw_water_mask(mesh_drawable const& water_visual, environment_camera const& environment)
 {
-	// Enable use of alpha component as color blending for transparent elements
-	//  alpha = current_color.alpha
-	//  new color = previous_color * alpha + current_color * (1-alpha)
 	glEnable(GL_BLEND);
+	glDepthMask(false);
+
+	glUseProgram(water_visual.shader); // assuming the water has the right shader
+	opengl_uniform(water_visual.shader, "alpha_only", true);
+
+	glBlendFunc(GL_ONE, GL_ONE);
+	draw(water_visual, environment);
+
+	glDepthMask(true);
+	glDisable(GL_BLEND);
+}
+
+// Draws semitransparent water
+void draw_water(mesh_drawable const& water_visual, environment_camera const& environment) {
+	glEnable(GL_BLEND);
+	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Disable depth buffer writing
-	//  - Transparent elements cannot use depth buffer
-	//  - They are supposed to be display from furest to nearest elements
+	// Disable depth buffer writing, important
 	glDepthMask(false);
 
 	draw(water_visual, environment);
 
-	// Don't forget to re-activate the depth-buffer write
 	glDepthMask(true);
 	glDisable(GL_BLEND);
 }

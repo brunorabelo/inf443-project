@@ -108,10 +108,10 @@ void main()
 		vec3 color_shading = (Ka + Kd * diffuse) * color_object + Ks * specular * vec3(1.0, 1.0, 1.0);
 	
 		// Output color, with the alpha component
-		FragColor = vec4(color_shading, alpha * color_image_texture.a);
+		FragColor = vec4(color_shading, 0);
 	}
 	else
-		FragColor = vec4(color_object, alpha * color_image_texture.a);
+		FragColor = vec4(color_object, 0);
 
 
 }

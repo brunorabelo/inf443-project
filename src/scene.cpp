@@ -83,7 +83,7 @@ void scene_structure::initialize() {
     //initalize boids_vector
     boids.setup();
 
-    christ.initialize(mesh_load_file_obj("assets/christ.obj"));
+    christ.initialize(mesh_load_file_obj("assets/christ.obj"), "christ", reflectable_shader);
     christ.texture = opengl_load_texture_image("assets/marmore1.jpg");
 
 
@@ -96,27 +96,20 @@ void scene_structure::initialize() {
 
 void scene_structure::display() {
 
+    
     // Basic elements of the scene
     environment.light = environment.camera.position();
     if (gui.display_frame)
         draw(global_frame, environment);
 
 
-    if (gui.display_cone) {
+    if (gui.display_cone)
         draw_reflectable(cone_visual, environment, false, gui.compute_lighting);
 
-        if (gui.reflect)
-            draw_reflectable(cone_visual, environment, true, gui.compute_lighting);
-    }
-
-
-    if (gui.display_water)
-        draw_water(water_visual, environment);
+    if (gui.display_christ)
+        draw_reflectable(christ, environment, false, gui.compute_lighting);
 
     if (gui.display_terrain) {
-        if (gui.reflect)
-            draw_reflectable(terrain_visual, environment, true, gui.compute_lighting);
-
         draw_reflectable(terrain_visual, environment, false, gui.compute_lighting);
 
         if (gui.display_wireframe)
@@ -125,8 +118,21 @@ void scene_structure::display() {
 
     if (gui.display_boids) display_boids();
 
-    draw(christ, environment);
+    if (gui.display_water) {
+        draw_water_mask(water_visual, environment);
 
+        if (gui.reflect) {
+            if (gui.display_cone)
+                draw_reflectable(cone_visual, environment, true, gui.compute_lighting);
+
+            if (gui.display_christ)
+                draw_reflectable(christ, environment, true, gui.compute_lighting);
+
+            if (gui.display_terrain)
+                draw_reflectable(terrain_visual, environment, true, gui.compute_lighting);
+
+        }
+    }
 }
 
 
@@ -165,6 +171,7 @@ void scene_structure::display_gui() {
     ImGui::Checkbox("Display terrain", &gui.display_terrain);
     ImGui::Checkbox("Display water", &gui.display_water);
     ImGui::Checkbox("Display cone", &gui.display_cone);
+    ImGui::Checkbox("Display Christ", &gui.display_christ);
 
     ImGui::Checkbox("Reflect", &gui.reflect);
 

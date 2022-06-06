@@ -23,5 +23,5 @@ void draw_terrain(cgp::mesh_drawable const& terrain_visual,
                   environment_camera const& environment,
     GLuint const fbo, bool reflect);
 
-
+void draw_water_mask(cgp::mesh_drawable const& water_visual, environment_camera const& environment);
 void draw_water(cgp::mesh_drawable const& drawable, environment_camera const& environment);

@@ -35,11 +35,13 @@ void main()
     // The position of the vertex in the world space
 	vec4 p = model * vec4(position, 1.0);
 
-	if(reflection)
-		p.z = -p.z;
-
 	// The normal of the vertex in the world space
 	vec4 n = model * vec4(normal, 0.0);
+
+	if(reflection) {
+		p.z = -p.z;
+		n.z = -n.z;
+	}
 
 	// The projected position of the vertex in the normalized device coordinates:
 	vec4 p_proj = projection * view * p;
