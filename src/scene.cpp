@@ -8,7 +8,7 @@ void scene_structure::initialize() {
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
     environment.camera.axis = camera_spherical_coordinates_axis::z;
-    environment.camera.look_at({120.0f, -20.0f, 20.0f}, {0, -40, 0.0f});
+    environment.camera.look_at({200.0f, 200.0f, 120.0f}, {0, -40, 0.0f});
 
 
     // Import shaders & textures
@@ -62,7 +62,7 @@ void scene_structure::update_camera() {
 
     float theta = mouse_position.y / camera_rotation_damping;
     float phi = mouse_position.x / camera_rotation_damping;
-    if (!inputs.mouse.on_gui && (pow(mouse_position.y, 2) + pow(mouse_position.x, 2)) > 0.10) {
+    if (gui.mouse_direction && !inputs.mouse.on_gui && (pow(mouse_position.y, 2) + pow(mouse_position.x, 2)) > 0.10) {
         camera.manipulator_rotate_spherical_coordinates(phi, -theta);
     }
 
@@ -70,17 +70,29 @@ void scene_structure::update_camera() {
     if (keyboard.up || keyboard.w_key) {
         if (keyboard.shift)
             camera.center_of_rotation += camera_speed * vec3{0, 0, 1};
+        else if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(0, camera_speed / camera_rotation_damping);
         else camera.center_of_rotation += camera_speed * camera.front();
     }
     if (keyboard.down || keyboard.s_key) {
         if (keyboard.shift)
             camera.center_of_rotation -= camera_speed * vec3{0, 0, 1};
+        else if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(0, -camera_speed / camera_rotation_damping);
         else camera.center_of_rotation -= camera_speed * camera.front();
     }
-    if (keyboard.left || keyboard.a_key)
-        camera.center_of_rotation -= camera_speed * camera.right();
-    if (keyboard.right || keyboard.d_key)
-        camera.center_of_rotation += camera_speed * camera.right();
+    if (keyboard.left || keyboard.a_key) {
+        if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(camera_speed / camera_rotation_damping, 0);
+        else
+            camera.center_of_rotation -= camera_speed * camera.right();
+    }
+    if (keyboard.right || keyboard.d_key) {
+        if (keyboard.ctrl)
+            camera.manipulator_rotate_spherical_coordinates(-camera_speed / camera_rotation_damping, 0);
+        else
+            camera.center_of_rotation += camera_speed * camera.right();
+    }
 
 }
 
@@ -127,6 +139,7 @@ void scene_structure::display_gui() {
     ImGui::Checkbox("Wireframe", &gui.display_wireframe);
     ImGui::SliderFloat("Camera Speed", &camera_speed, 1.0f, 10.0f);
     ImGui::SliderFloat("Camera Rotation Damping", &camera_rotation_damping, 1.0f, 50.0f);
+    ImGui::Checkbox("Mouse camera direction", &gui.mouse_direction);
     bool pressed = ImGui::Button("Reset Camera");
     if (pressed)
         reset_camera();
