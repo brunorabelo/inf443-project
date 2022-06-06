@@ -73,6 +73,8 @@ void scene_structure::update_camera() {
         camera.manipulator_rotate_spherical_coordinates(phi, -theta);
     }
 
+    camera.distance_to_center = 140.0f;
+
 
     if (keyboard.up || keyboard.w_key) {
         if (keyboard.shift)

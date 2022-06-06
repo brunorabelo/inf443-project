@@ -35,7 +35,7 @@ int main(int, char *argv[]) {
     // ************************ //
 
     // Standard Initialization with dimension_size in pixels
-    GLFWwindow *window = standard_window_initialization(1280, 1080);
+    GLFWwindow *window = standard_window_initialization(1280, 720);
 
     // Custom scene initialization
     std::cout << "Initialize data of the scene ..." << std::endl;
