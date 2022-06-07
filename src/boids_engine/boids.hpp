@@ -57,6 +57,7 @@ public:
 
     void display(environment_camera environment, bool wireframe, bool cube);
 
+    Boid *get_boid();
 };
 
 

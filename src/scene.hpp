@@ -22,6 +22,8 @@ struct gui_parameters {
     bool reflect = true;
     bool terrain_modeling_mode = false;
     bool boids_modeling_mode = false;
+    bool camera_bird = true;
+    bool dev_mode = false;
 };
 
 
@@ -68,6 +70,8 @@ struct scene_structure {
     Boids boids2;
 
     mesh_drawable christ;
+
+    Boid *boid;
 
     // Timer used for the interpolation of the position
     cgp::timer_event_periodic timer;

@@ -8,7 +8,6 @@
 using namespace cgp;
 
 
-
 void Boids::addBoid(vec3 position = {0, 0, 1}, vec3 velocity = {0, 0, 0}) {
 
     boids_vector.emplace_back(Boid(position, velocity, 10.0f));
@@ -189,3 +188,8 @@ void Boids::display(environment_camera environment, bool wireframe = false, bool
     }
 
 }
+
+Boid *Boids::get_boid() {
+    return &boids_vector[0];
+}
+

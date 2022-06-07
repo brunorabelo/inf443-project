@@ -11,7 +11,7 @@
 #define PROJECT_BIRD_HPP
 
 
-class Bird : public boid_object {
+class Bird {
 
     cgp::mesh_drawable body;
     cgp::mesh_drawable head;
@@ -36,6 +36,8 @@ public:
     void rotate(cgp::rotation_transform rt);
 
     void translate(cgp::vec3 t);
+
+    cgp::vec3 get_position();
 };
 
 

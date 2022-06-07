@@ -9,9 +9,9 @@ void scene_structure::initialize() {
     // Basic set-up
     // ***************************************** //
     global_frame.initialize(mesh_primitive_frame(), "Frame");
-    environment.camera.axis = camera_spherical_coordinates_axis::z;
-    environment.camera.look_at({200.0f, 200.0f, 120.0f}, {0, -40, 0.0f});
 
+    environment.camera.axis = camera_spherical_coordinates_axis::z;
+    environment.camera.distance_to_center = 120.0f;
 
     // Import shaders & textures
     reflectable_shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
@@ -46,6 +46,7 @@ void scene_structure::initialize() {
 
     boids1.setup();
     boids2.setup();
+    boid = boids2.get_boid();
     // Christ the Redeemer statue
     christ.initialize(mesh_load_file_obj("assets/christ.obj"), "christ", reflectable_shader);
     christ.texture = opengl_load_texture_image("assets/marmore1.jpg");
@@ -73,8 +74,9 @@ void scene_structure::update_camera() {
         camera.manipulator_rotate_spherical_coordinates(phi, -theta);
     }
 
-    camera.distance_to_center = 140.0f;
-
+    if (gui.camera_bird) {
+        environment.camera.center_of_rotation = boid->position;
+    }
 
     if (keyboard.up || keyboard.w_key) {
         if (keyboard.shift)
@@ -145,6 +147,7 @@ void scene_structure::display(float dt, float total_time) {
         boids2.display(environment, gui.display_wireframe, gui.display_cube);
     }
 
+
     draw_reflectable(christ, environment, false, gui.compute_lighting);
     if (gui.reflect)
         draw_reflectable(christ, environment, true, gui.compute_lighting);
@@ -153,11 +156,18 @@ void scene_structure::display(float dt, float total_time) {
 }
 
 void scene_structure::display_gui() {
+    ImGui::Checkbox("Bird Camera", &gui.camera_bird);
+    ImGui::Checkbox("Mouse camera direction", &gui.mouse_direction);
+    ImGui::SliderFloat("Camera distance to center", &environment.camera.distance_to_center, 1.0f, 200.0f);
+    ImGui::Checkbox("Dev Mode", &gui.dev_mode);
+    if (!gui.dev_mode)
+        return;
+
     ImGui::Checkbox("Frame", &gui.display_frame);
     ImGui::Checkbox("Wireframe", &gui.display_wireframe);
     ImGui::SliderFloat("Camera Speed", &camera_speed, 1.0f, 10.0f);
     ImGui::SliderFloat("Camera Rotation Damping", &camera_rotation_damping, 1.0f, 50.0f);
-    ImGui::Checkbox("Mouse camera direction", &gui.mouse_direction);
+
     bool pressed = ImGui::Button("Reset Camera");
     if (pressed)
         reset_camera();
