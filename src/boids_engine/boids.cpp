@@ -9,7 +9,7 @@ using namespace cgp;
 
 
 void Boids::addBoid(vec3 position = {0, 0, 1}, vec3 velocity = {0, 0, 0}) {
-
+    // add a boid to boids_vector
     boids_vector.emplace_back(Boid(position, velocity, 10.0f));
 }
 
@@ -23,6 +23,7 @@ Boids::Boids() : Boids(80.0f, {0, 0, 40.0f}) {};
 
 
 void Boids::setup() {
+    // initialize the positions and velocoities of the boids
     vec3 center = this->dimension_center;
     int N = 30;
     assert(N > 1);
@@ -48,13 +49,14 @@ void Boids::setup() {
         float const y = (rand_interval() - 0.5f) * 2.0f;
         float const z = (rand_interval() - 0.5f) * 2.0f;
         this->addBoid(position, {x, y, z});
-//        this->addBoid(position, {0, 1, 10});
     }
+    //initialize a cube to check the limits of the group movements
     cube_mesh_drawable.initialize(mesh_primitive_cube(center, initial_dimension_size));
 
 }
 
 vec3 Boids::limit_velocity(vec3 velocity) {
+    // limit the velocity of each boid
     float curr_speed = norm(velocity);
     vec3 new_speed = velocity;
     if (curr_speed > max_speed) {
@@ -147,7 +149,7 @@ cgp::vec3 Boids::rule3(Boid &boid) {
 }
 
 cgp::vec3 Boids::bound_position(Boid &boid) {
-
+    // bound the movement of the boids
     vec3 new_speed = boid.velocity;
 
     vec3 min = dimension_center - dimension_size / 2.0f;

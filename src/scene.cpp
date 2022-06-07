@@ -68,16 +68,19 @@ void scene_structure::update_camera() {
 
     float sensibility = 0.5;
 
+    // Mouse movement of the camera
     float theta = mouse_position.y / camera_rotation_damping;
     float phi = mouse_position.x / camera_rotation_damping;
     if (gui.mouse_direction && !inputs.mouse.on_gui && (pow(mouse_position.y, 2) + pow(mouse_position.x, 2)) > 0.10) {
         camera.manipulator_rotate_spherical_coordinates(phi, -theta);
     }
 
+    // camera in the bird
     if (gui.camera_bird) {
         environment.camera.center_of_rotation = boid->position;
     }
 
+    // keyboard manipulating the camera
     if (keyboard.up || keyboard.w_key) {
         if (keyboard.shift)
             camera.center_of_rotation += camera_speed * vec3{0, 0, 1};
@@ -147,7 +150,7 @@ void scene_structure::display(float dt, float total_time) {
         boids2.display(environment, gui.display_wireframe, gui.display_cube);
     }
 
-
+    // display christ
     draw_reflectable(christ, environment, false, gui.compute_lighting);
     if (gui.reflect)
         draw_reflectable(christ, environment, true, gui.compute_lighting);

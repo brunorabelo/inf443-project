@@ -10,6 +10,7 @@ using namespace cgp;
 
 
 void Bird::setup() {
+    // initalize a bird
     GLuint shader = opengl_load_shader("shaders/reflectable/vert.glsl", "shaders/reflectable/frag.glsl");
 
     float scale = 1;
@@ -19,7 +20,6 @@ void Bird::setup() {
     auto bird_texture = opengl_load_texture_image("assets/bird.jpg");
     body.initialize(m, "body", shader);
     body.texture = opengl_load_texture_image("assets/bird2.jpg");
-//    body.shading.color = {0, 0, 0};
     body.transform.scaling = scale;
 
     head.initialize(mesh_primitive_sphere(0.9f), "head", shader);
@@ -28,13 +28,11 @@ void Bird::setup() {
 
     wing_left.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_left", shader);
     wing_left.texture = bird_texture;
-//    wing_left.transform.translation = {0,0,1};
     wing_left.transform.scaling = scale;
 
     wing_right.initialize(mesh_load_file_obj("assets/wing.obj"), "wing_right", shader);
     wing_right.transform.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi);
     wing_right.texture = bird_texture;
-//    wing_right.transform.translation = {-1,-1,1};
     wing_right.transform.scaling = scale;
 
     eye_left.initialize(mesh_primitive_sphere(0.2f), "eye_left", shader);
@@ -45,7 +43,6 @@ void Bird::setup() {
     eye_right.shading.color = {1.0f, 1.0f, 1.0f};
     eye_right.transform.scaling = scale;
 
-//    tail.initialize(mesh_primitive_cylinder())
 
 
 
@@ -75,6 +72,7 @@ void Bird::display_wireframe(environment_camera coords) {
 }
 
 void Bird::animate(float t, float speed_z) {
+    // animate the wings of the bird according to the z coordinate of the movement
     float phase = 0;
     if (speed_z < 0)
         return;

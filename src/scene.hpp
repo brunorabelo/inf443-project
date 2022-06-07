@@ -66,12 +66,12 @@ struct scene_structure {
     std::vector<cgp::vec3> mushroom_position;
     std::vector<cgp::vec3> billboard_position;
 
-    Boids boids1;
-    Boids boids2;
+    Boids boids1; // the first group of boids
+    Boids boids2; // the second group of boids
 
-    mesh_drawable christ;
+    mesh_drawable christ; // the christ
 
-    Boid *boid;
+    Boid *boid; //boid associate with the camera if the camera boid is active
 
     // Timer used for the interpolation of the position
     cgp::timer_event_periodic timer;
@@ -89,7 +89,6 @@ struct scene_structure {
 
     void display(float dt, float total_time);     // The frame display to be called within the animation loop
     void display_gui(); // The display of the GUI, also called within the animation loop
-
 
     void reset_camera();
 };

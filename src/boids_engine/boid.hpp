@@ -7,7 +7,6 @@
 
 #include "cgp/cgp.hpp"
 #include "environment_camera/environment_camera.hpp"
-#include "boid_object.hpp"
 #include "bird.hpp"
 
 static int count = 0;

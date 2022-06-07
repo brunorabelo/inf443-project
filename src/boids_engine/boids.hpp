@@ -32,7 +32,6 @@ private:
 
     void update();
 
-    static boid_object create_boid_object(std::string name);
 
 
 public:
